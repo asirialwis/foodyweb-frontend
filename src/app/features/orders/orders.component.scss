@@ -1,0 +1,198 @@
+:host {
+  display: block;
+}
+
+.orders-head,
+.toolbar,
+.order-list {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.orders-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.orders-head h1 {
+  margin: 0;
+}
+
+.orders-head p {
+  margin: 0.2rem 0 0;
+  color: #475467;
+}
+
+.orders-head a {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  background: #16a34a;
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.56rem 0.95rem;
+  font-weight: 600;
+}
+
+.toolbar {
+  margin-bottom: 0.8rem;
+}
+
+.toolbar label {
+  display: inline-grid;
+  gap: 0.3rem;
+  color: #344054;
+  font-weight: 600;
+}
+
+select,
+button {
+  border-radius: 0.55rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #d0d5dd;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+button {
+  border: 0;
+  background: #111827;
+  color: #fff;
+  cursor: pointer;
+}
+
+.warn {
+  background: #ef4444;
+}
+
+.order-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+article {
+  background: #fff;
+  border: 1px solid #eaecf0;
+  border-radius: 0.9rem;
+  padding: 0.9rem;
+}
+
+article header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chip {
+  background: #f4f4f5;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+ul {
+  margin: 0.6rem 0;
+  padding-left: 1.2rem;
+  color: #475467;
+}
+
+footer {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+footer select,
+footer button {
+  min-width: 140px;
+}
+
+.empty {
+  padding: 1rem;
+  border-radius: 0.7rem;
+  background: #fff;
+  border: 1px dashed #d0d5dd;
+  color: #667085;
+}
+
+@media (max-width: 1024px) {
+  .orders-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .orders-head a {
+    margin-top: 0.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .orders-head h1 {
+    font-size: 1.4rem;
+  }
+
+  .orders-head p {
+    font-size: 0.95rem;
+  }
+
+  .toolbar {
+    margin-bottom: 0.7rem;
+  }
+
+  .toolbar label {
+    width: 100%;
+  }
+
+  .toolbar select {
+    width: 100%;
+  }
+
+  article {
+    padding: 0.75rem;
+  }
+
+  article header {
+    align-items: flex-start;
+    gap: 0.45rem;
+    flex-direction: column;
+  }
+
+  ul {
+    margin: 0.5rem 0;
+  }
+
+  footer {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  footer select,
+  footer button {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .orders-head h1 {
+    font-size: 1.28rem;
+  }
+
+  .orders-head p {
+    font-size: 0.9rem;
+  }
+
+  .orders-head a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .chip {
+    font-size: 0.8rem;
+  }
+}

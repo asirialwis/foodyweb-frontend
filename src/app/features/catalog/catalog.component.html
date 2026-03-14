@@ -1,0 +1,113 @@
+<div class="catalog-page">
+  <section class="hero">
+    <h1>Order from top-rated restaurants</h1>
+    <p>Fresh food, fast delivery, and simple checkout.</p>
+
+    <div class="search">
+      <input [(ngModel)]="cuisine" placeholder="Search cuisine (e.g. Italian, Sri Lankan, Burgers)" />
+      <button type="button" (click)="loadRestaurants()">Find food</button>
+    </div>
+  </section>
+
+  <section class="layout">
+  <div class="restaurants">
+    <h2>Restaurants</h2>
+    <div class="cards">
+      @for (restaurant of restaurants(); track restaurant._id ?? restaurant.id ?? restaurant.name) {
+        <button class="card" type="button" (click)="selectRestaurant(restaurant)">
+          <div class="card-top">
+            <h3>{{ restaurant.name }}</h3>
+            @if ((restaurant.rating ?? 0) > 0) {
+              <span class="badge">★ {{ restaurant.rating }}</span>
+            }
+          </div>
+          <p>{{ restaurant.cuisine?.join(', ') || 'Various cuisines' }}</p>
+          <small>{{ formatAddress(restaurant) }}</small>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="menu">
+    <h2>
+      @if (selectedRestaurant()) {
+        {{ selectedRestaurant()?.name }} menu
+      } @else {
+        Select a restaurant
+      }
+    </h2>
+
+    <div class="menu-list">
+      @for (item of menuItems(); track item._id ?? item.id ?? item.name) {
+        <article>
+          <div>
+            <h4>{{ item.name }}</h4>
+            <p>{{ item.description || 'Chef’s special' }}</p>
+            <small>{{ item.category }}</small>
+          </div>
+          <div class="menu-meta">
+            <strong>$ {{ item.price }}</strong>
+            <button type="button" (click)="addToCart(item)">Add</button>
+          </div>
+        </article>
+      }
+    </div>
+  </div>
+
+  <aside class="cart">
+    <h2>Your cart</h2>
+    <div class="cart-body">
+      <div class="cart-items">
+        @if (!cartItems().length) {
+          <p class="muted">Add items to start your order.</p>
+        }
+
+        @for (item of cartItems(); track item.menuItemId) {
+          <div class="cart-item">
+            <div>
+              <strong>{{ item.name }}</strong>
+              <small>$ {{ item.price }} each</small>
+            </div>
+            <div class="qty">
+              <button type="button" (click)="decrease(item.menuItemId)">−</button>
+              <span>{{ item.quantity }}</span>
+              <button type="button" (click)="increase(item.menuItemId)">+</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="checkout-panel">
+        <div class="subtotal">
+          <span>Subtotal</span>
+          <strong>$ {{ subtotal() }}</strong>
+        </div>
+
+        <form [formGroup]="checkoutForm" (ngSubmit)="checkout()">
+          <input formControlName="street" placeholder="Street address" />
+          <div class="grid-two">
+            <input formControlName="city" placeholder="City" />
+            <input formControlName="state" placeholder="State" />
+          </div>
+          <div class="grid-two">
+            <input formControlName="zipCode" placeholder="Zip code" />
+            <input formControlName="country" placeholder="Country" />
+          </div>
+
+          <select formControlName="paymentMethod">
+            <option value="credit_card">Credit Card</option>
+            <option value="cash">Cash</option>
+            <option value="digital_wallet">Digital Wallet</option>
+          </select>
+
+          <input formControlName="specialInstructions" placeholder="Delivery instructions (optional)" />
+
+          <button class="place-order-btn" type="submit" [disabled]="!canCheckout() || placingOrder">
+            {{ placingOrder ? 'Placing order...' : 'Place order' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </aside>
+  </section>
+</div>

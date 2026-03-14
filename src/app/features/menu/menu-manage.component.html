@@ -1,0 +1,37 @@
+<section class="heading">
+  <h1>Menu workspace</h1>
+  <p>Add and manage dishes for your restaurants.</p>
+</section>
+
+<form class="create-form" [formGroup]="form" (ngSubmit)="create()">
+  <select formControlName="restaurantId">
+    <option value="">Select restaurant</option>
+    @for (restaurant of availableRestaurants(); track restaurant._id ?? restaurant.id ?? restaurant.name) {
+      <option [value]="restaurant._id ?? restaurant.id">{{ restaurant.name }}</option>
+    }
+  </select>
+  <input formControlName="name" placeholder="Dish name" />
+  <input formControlName="category" placeholder="Category" />
+  <input formControlName="price" type="number" placeholder="Price" />
+  <input formControlName="description" placeholder="Description" />
+  <button type="submit" [disabled]="form.invalid">Add item</button>
+</form>
+
+<section class="list">
+  @for (item of items(); track item._id ?? item.id ?? item.name) {
+    <article>
+      <div>
+        <h3>{{ item.name }}</h3>
+        <p>{{ item.category }} • $ {{ item.price }}</p>
+        <small>{{ item.description || 'No description' }}</small>
+      </div>
+
+      <div class="actions">
+        <button type="button" (click)="toggleAvailability(item)">
+          {{ item.isAvailable === false ? 'Set available' : 'Set unavailable' }}
+        </button>
+        <button type="button" class="danger" (click)="remove(item)">Delete</button>
+      </div>
+    </article>
+  }
+</section>

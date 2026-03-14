@@ -1,0 +1,61 @@
+<section class="heading">
+  <h1>{{ isDriver() ? 'My deliveries' : 'Delivery operations' }}</h1>
+  <p>
+    @if (isDriver()) {
+      Update trip status and keep customers informed.
+    } @else {
+      Assign drivers and monitor delivery execution.
+    }
+  </p>
+</section>
+
+<div class="toolbar">
+  <label>
+    Status
+    <select [(ngModel)]="statusFilter" (change)="load()">
+      <option value="">All</option>
+      <option value="pending">Pending</option>
+      <option value="assigned">Assigned</option>
+      <option value="picked_up">Picked up</option>
+      <option value="in_transit">In transit</option>
+      <option value="delivered">Delivered</option>
+      <option value="failed">Failed</option>
+    </select>
+  </label>
+  <button type="button" (click)="load()">Refresh</button>
+</div>
+
+<section class="list">
+  @if (!deliveries().length) {
+    <p class="empty">No deliveries available.</p>
+  }
+
+  @for (delivery of deliveries(); track delivery._id ?? delivery.id ?? delivery.orderId) {
+    <article>
+      <header>
+        <strong>#{{ delivery._id ?? delivery.id }}</strong>
+        <span class="chip">{{ delivery.status }}</span>
+      </header>
+
+      <p>Order: {{ delivery.orderId }}</p>
+      <p>Driver: {{ delivery.driverId || 'unassigned' }}</p>
+
+      <footer>
+        <select #statusSel>
+          <option value="pending">pending</option>
+          <option value="assigned">assigned</option>
+          <option value="picked_up">picked_up</option>
+          <option value="in_transit">in_transit</option>
+          <option value="delivered">delivered</option>
+          <option value="failed">failed</option>
+        </select>
+        <button type="button" (click)="updateStatus(delivery, statusSel.value)">Update status</button>
+
+        @if (!isDriver()) {
+          <input #driverInput placeholder="Driver ID" />
+          <button type="button" (click)="assign(delivery, driverInput.value)">Assign</button>
+        }
+      </footer>
+    </article>
+  }
+</section>

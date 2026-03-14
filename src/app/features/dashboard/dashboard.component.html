@@ -1,0 +1,19 @@
+<section class="home-hero">
+  <h1>{{ headline() }}</h1>
+  <p>{{ subline() }}</p>
+</section>
+
+<section class="metrics">
+  @for (metric of metrics(); track metric.label) {
+    <article>
+      <h3>{{ metric.value }}</h3>
+      <p>{{ metric.label }}</p>
+    </article>
+  }
+</section>
+
+<section class="actions">
+  @for (action of actions(); track action.link) {
+    <a [routerLink]="action.link">{{ action.label }}</a>
+  }
+</section>

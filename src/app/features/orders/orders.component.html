@@ -1,0 +1,79 @@
+<section class="orders-head">
+  <div>
+    <h1>{{ pageTitle() }}</h1>
+    <p>{{ pageSubtitle() }}</p>
+  </div>
+
+  @if (canCreateOrder()) {
+    <a routerLink="/catalog">Start new order</a>
+  }
+</section>
+
+<div class="toolbar">
+  <label>
+    Status
+    <select [(ngModel)]="statusFilter" (change)="loadOrders()">
+      <option value="">All</option>
+      <option value="pending">Pending</option>
+      <option value="confirmed">Confirmed</option>
+      <option value="preparing">Preparing</option>
+      <option value="ready">Ready</option>
+      <option value="picked_up">Picked up</option>
+      <option value="delivered">Delivered</option>
+      <option value="cancelled">Cancelled</option>
+    </select>
+  </label>
+</div>
+
+<section class="order-list">
+  @if (!orders().length) {
+    <p class="empty">No orders found.</p>
+  }
+
+  @for (order of orders(); track order._id ?? order.id ?? order.restaurantId + order.userId) {
+    <article>
+      <header>
+        <strong>#{{ order._id ?? order.id }}</strong>
+        <span class="chip">{{ order.status }}</span>
+      </header>
+
+      <p>{{ order.items.length }} items • $ {{ order.totalAmount }}</p>
+      <p>Payment: {{ order.paymentStatus }}</p>
+
+      <ul>
+        @for (item of order.items; track item.menuItemId + item.name) {
+          <li>{{ item.quantity }} × {{ item.name }}</li>
+        }
+      </ul>
+
+      <footer>
+        @if (canManageStatus()) {
+          <select #statusSel>
+            <option value="pending">pending</option>
+            <option value="confirmed">confirmed</option>
+            <option value="preparing">preparing</option>
+            <option value="ready">ready</option>
+            <option value="picked_up">picked_up</option>
+            <option value="delivered">delivered</option>
+            <option value="cancelled">cancelled</option>
+          </select>
+          <button type="button" (click)="updateStatus(order, statusSel.value)">Update status</button>
+        }
+
+        @if (canManagePayment()) {
+          <select #paySel>
+            <option value="pending">pending</option>
+            <option value="paid">paid</option>
+            <option value="failed">failed</option>
+            <option value="refunded">refunded</option>
+          </select>
+          <button type="button" (click)="updatePayment(order, paySel.value)">Update payment</button>
+        }
+
+        @if (canCancel(order)) {
+          <button type="button" class="warn" (click)="cancel(order)">Cancel order</button>
+        }
+      </footer>
+    </article>
+  }
+</section>

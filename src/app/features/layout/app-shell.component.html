@@ -1,0 +1,26 @@
+<div class="shell">
+  <header class="topbar">
+    <div class="brand" routerLink="/dashboard">FoodyWeb</div>
+
+    <nav class="main-nav">
+      @for (item of navItems(); track item.link) {
+        <a [routerLink]="item.link" routerLinkActive="active">{{ item.label }}</a>
+      }
+    </nav>
+
+    <div class="account-actions">
+      <span class="welcome">Hi, {{ firstName() }}</span>
+      <button type="button" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  @if (toast()) {
+    <div class="toast" [class.error]="toast()?.type === 'error'">
+      {{ toast()?.text }}
+    </div>
+  }
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

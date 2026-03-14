@@ -1,0 +1,36 @@
+<section class="heading">
+  <h1>Restaurant workspace</h1>
+  <p>Create and manage storefront details.</p>
+</section>
+
+<form class="create-form" [formGroup]="form" (ngSubmit)="create()">
+  <input formControlName="name" placeholder="Restaurant name" />
+  <input formControlName="cuisine" placeholder="Cuisine (comma separated)" />
+  <input formControlName="phone" placeholder="Phone" />
+  <input formControlName="city" placeholder="City" />
+
+  @if (isAdmin()) {
+    <input formControlName="ownerId" placeholder="Owner user ID" />
+  }
+
+  <button type="submit" [disabled]="form.invalid">Create restaurant</button>
+</form>
+
+<section class="list">
+  @for (restaurant of restaurants(); track restaurant._id ?? restaurant.id ?? restaurant.name) {
+    <article>
+      <div>
+        <h3>{{ restaurant.name }}</h3>
+        <p>{{ restaurant.cuisine?.join(', ') || 'No cuisines listed' }}</p>
+        <small>{{ restaurant.phone || 'No phone' }}</small>
+      </div>
+
+      <div class="actions">
+        <button type="button" (click)="toggleActive(restaurant)">
+          {{ restaurant.isActive === false ? 'Activate' : 'Deactivate' }}
+        </button>
+        <button type="button" class="danger" (click)="remove(restaurant)">Delete</button>
+      </div>
+    </article>
+  }
+</section>

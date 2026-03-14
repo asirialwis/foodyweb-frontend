@@ -1,0 +1,155 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #1f2937, #111827);
+}
+
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  align-items: center;
+  gap: 2rem;
+  max-width: 1150px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.hero {
+  color: #fff;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 4vw, 3.3rem);
+  margin-bottom: 0.7rem;
+}
+
+.hero p {
+  color: #d1d5db;
+  max-width: 530px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 1rem;
+  padding: 1.35rem;
+  display: grid;
+  gap: 0.75rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  width: min(480px, 100%);
+  justify-self: end;
+  box-sizing: border-box;
+}
+
+.form-head h2 {
+  margin: 0;
+}
+
+.form-head p {
+  margin: 0.25rem 0 0;
+  color: #667085;
+  font-size: 0.95rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: #344054;
+}
+
+input {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.6rem;
+  padding: 0.68rem 0.75rem;
+  box-sizing: border-box;
+  min-height: 44px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15);
+}
+
+.submit-btn {
+  margin-top: 0.4rem;
+  border: 0;
+  border-radius: 0.65rem;
+  min-height: 46px;
+  padding: 0.72rem;
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+.submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.alt {
+  font-size: 0.92rem;
+  color: #475467;
+}
+
+.alt a {
+  color: #0ea5e9;
+  text-decoration: none;
+}
+
+@media (max-width: 1100px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .card {
+    justify-self: stretch;
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .auth-page {
+    padding: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 390px) {
+  .hero h1 {
+    font-size: 1.7rem;
+  }
+
+  .hero p {
+    font-size: 0.92rem;
+  }
+
+  .card {
+    padding: 1rem;
+    border-radius: 0.85rem;
+  }
+
+  input,
+  .submit-btn {
+    min-height: 42px;
+    font-size: 0.94rem;
+  }
+}

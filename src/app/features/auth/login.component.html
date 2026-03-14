@@ -1,0 +1,25 @@
+<div class="auth-page">
+  <div class="hero">
+    <h1>Get food delivered fast.</h1>
+    <p>Sign in to browse restaurants, track orders, and manage deliveries.</p>
+  </div>
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <h2>Welcome back</h2>
+
+    <label for="email">Email</label>
+    <input id="email" formControlName="email" type="email" placeholder="name@email.com" />
+
+    <label for="password">Password</label>
+    <input id="password" formControlName="password" type="password" placeholder="••••••••" />
+
+    <button type="submit" [disabled]="form.invalid || loading">
+      {{ loading ? 'Signing in...' : 'Sign in' }}
+    </button>
+
+    <p class="alt">
+      New to FoodyWeb?
+      <a routerLink="/register">Create an account</a>
+    </p>
+  </form>
+</div>

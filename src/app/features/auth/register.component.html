@@ -1,0 +1,48 @@
+<div class="auth-page">
+  <div class="hero">
+    <h1>Create your FoodyWeb account.</h1>
+    <p>Order from local favorites, run your restaurant storefront, or deliver with ease.</p>
+  </div>
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="form-head">
+      <h2>Sign up</h2>
+      <p>Start ordering in minutes.</p>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="firstName">First Name</label>
+        <input id="firstName" formControlName="firstName" type="text" placeholder="John" />
+      </div>
+      <div class="field">
+        <label for="lastName">Last Name</label>
+        <input id="lastName" formControlName="lastName" type="text" placeholder="Doe" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" formControlName="email" type="email" placeholder="john@email.com" />
+    </div>
+
+    <div class="field">
+      <label for="phone">Phone</label>
+      <input id="phone" formControlName="phone" type="text" placeholder="+94 77 123 4567" />
+    </div>
+
+    <div class="field">
+      <label for="password">Password</label>
+      <input id="password" formControlName="password" type="password" placeholder="Minimum 6 characters" />
+    </div>
+
+    <button class="submit-btn" type="submit" [disabled]="form.invalid || loading">
+      {{ loading ? 'Creating account...' : 'Create account' }}
+    </button>
+
+    <p class="alt">
+      Already have an account?
+      <a routerLink="/login">Sign in</a>
+    </p>
+  </form>
+</div>

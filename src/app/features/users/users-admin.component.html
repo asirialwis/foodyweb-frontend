@@ -1,0 +1,32 @@
+<section class="heading">
+  <h1>User administration</h1>
+  <p>Manage account roles and basic profile details.</p>
+</section>
+
+<section class="list">
+  @for (user of users(); track user.id ?? user.email) {
+    <article>
+      <header>
+        <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+        <span>{{ user.role }}</span>
+      </header>
+
+      <p>{{ user.email }}</p>
+
+      <form [formGroup]="editForms[user.id || '']" (ngSubmit)="update(user)">
+        <input formControlName="firstName" placeholder="First name" />
+        <input formControlName="lastName" placeholder="Last name" />
+        <input formControlName="phone" placeholder="Phone" />
+        <select formControlName="role">
+          <option value="customer">customer</option>
+          <option value="restaurant_owner">restaurant owner</option>
+          <option value="delivery_driver">delivery driver</option>
+          <option value="admin">admin</option>
+        </select>
+
+        <button type="submit">Save</button>
+        <button type="button" class="danger" (click)="remove(user)">Delete</button>
+      </form>
+    </article>
+  }
+</section>
