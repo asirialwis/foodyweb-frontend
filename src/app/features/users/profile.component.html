@@ -1,0 +1,365 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <h1 class="text-3xl font-bold text-gray-900">My Account</h1>
+      <p class="text-gray-600 mt-1">Manage your profile, addresses, and preferences</p>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    @if (loadingSignal()) {
+      <div class="text-center py-12">
+        <div class="inline-block w-12 h-12 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin"></div>
+        <p class="text-gray-600 mt-4">Loading your profile...</p>
+      </div>
+    } @else {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Sidebar: Stats & Avatar -->
+        <div class="lg:col-span-1">
+          <div class="card text-center">
+            <div class="w-24 h-24 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-4xl mx-auto mb-4">
+              {{ userSignal()?.firstName?.charAt(0) }}{{ userSignal()?.lastName?.charAt(0) }}
+            </div>
+            <h2 class="text-xl font-bold text-gray-900">{{ userSignal()?.firstName }} {{ userSignal()?.lastName }}</h2>
+            <p class="text-gray-600 text-sm mt-1">{{ userSignal()?.email }}</p>
+            
+            <div class="mt-6 space-y-4 border-t pt-6">
+              <div>
+                <p class="text-gray-600 text-sm">Member Since</p>
+                <p class="font-semibold text-gray-900">{{ stats().memberSince }}</p>
+              </div>
+              <div>
+                <p class="text-gray-600 text-sm">Rating</p>
+                <p class="font-semibold text-gray-900">
+                  ⭐ {{ stats().avgRating.toFixed(1) }}/5
+                </p>
+              </div>
+              <div>
+                <p class="text-gray-600 text-sm">Total Orders</p>
+                <p class="font-semibold text-gray-900">{{ stats().totalOrders }}</p>
+              </div>
+            </div>
+
+            <button 
+              (click)="logout()"
+              class="w-full btn btn-danger mt-6"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- Main Content: Profile, Addresses, Password -->
+        <div class="lg:col-span-2 space-y-8">
+          <!-- Profile Section -->
+          <div class="card">
+            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Personal Information
+            </h3>
+
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-4">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
+                  <input
+                    formControlName="firstName"
+                    type="text"
+                    placeholder="John"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
+                  <input
+                    formControlName="lastName"
+                    type="text"
+                    placeholder="Doe"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <input
+                  formControlName="email"
+                  type="email"
+                  [disabled]="true"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
+                />
+                <p class="text-xs text-gray-500 mt-1">Email cannot be changed for security</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+                <input
+                  formControlName="phone"
+                  type="tel"
+                  placeholder="9876543210"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="profileForm.invalid || savingSignal()"
+                class="w-full btn btn-primary"
+              >
+                @if (savingSignal()) {
+                  <span class="inline-block animate-spin mr-2">⟳</span>
+                  Saving...
+                } @else {
+                  Save Changes
+                }
+              </button>
+            </form>
+          </div>
+
+          <!-- Addresses Section -->
+          <div class="card">
+            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Delivery Addresses
+              </div>
+              @if (!showAddressFormSignal()) {
+                <button 
+                  (click)="showAddressFormSignal.set(true)"
+                  class="btn btn-sm btn-primary"
+                >
+                  + Add Address
+                </button>
+              }
+            </h3>
+
+            @if (showAddressFormSignal()) {
+              <form [formGroup]="addressForm" class="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg border-2 border-primary-200">
+                <h4 class="font-semibold text-gray-900">
+                  {{ editingAddressIndexSignal() !== null ? 'Edit Address' : 'Add New Address' }}
+                </h4>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Street Address</label>
+                  <input
+                    formControlName="street"
+                    type="text"
+                    placeholder="123 Main Street"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Apartment/Suite (Optional)</label>
+                  <input
+                    formControlName="apartment"
+                    type="text"
+                    placeholder="Apt 101"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">City</label>
+                    <input
+                      formControlName="city"
+                      type="text"
+                      placeholder="New York"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">State</label>
+                    <input
+                      formControlName="state"
+                      type="text"
+                      placeholder="NY"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Zip Code</label>
+                    <input
+                      formControlName="zipCode"
+                      type="text"
+                      placeholder="10001"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Country</label>
+                    <input
+                      formControlName="country"
+                      type="text"
+                      placeholder="USA"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                  </div>
+                </div>
+
+                <div class="flex items-center">
+                  <input
+                    id="isDefault"
+                    type="checkbox"
+                    formControlName="isDefault"
+                    class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <label for="isDefault" class="ml-3 text-sm font-medium text-gray-700">
+                    Set as default delivery address
+                  </label>
+                </div>
+
+                <div class="flex gap-3">
+                  <button
+                    type="button"
+                    (click)="editingAddressIndexSignal() !== null ? updateAddress(editingAddressIndexSignal()!) : addAddress()"
+                    [disabled]="addressForm.invalid || savingSignal()"
+                    class="flex-1 btn btn-primary"
+                  >
+                    {{ editingAddressIndexSignal() !== null ? 'Update Address' : 'Add Address' }}
+                  </button>
+                  <button
+                    type="button"
+                    (click)="cancelAddressForm()"
+                    class="flex-1 btn btn-outline"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            }
+
+            @if (addresses().length > 0) {
+              <div class="space-y-3">
+                @for (address of addresses(); track $index) {
+                  <div class="p-4 border border-gray-300 rounded-lg hover:border-primary-500 transition">
+                    <div class="flex items-start justify-between">
+                      <div class="flex-1">
+                        <p class="font-semibold text-gray-900">
+                          {{ address.street }}
+                          @if (address.label === 'home') {
+                            <span class="ml-2 text-xs font-bold bg-green-100 text-green-800 px-2 py-1 rounded">DEFAULT</span>
+                          }
+                        </p>
+                        <p class="text-sm text-gray-600">
+                          @if (address.apartment) {
+                            {{ address.apartment }},
+                          }
+                          {{ address.city }}, {{ address.state }} {{ address.zipCode }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">{{ address.country }}</p>
+                      </div>
+                      <div class="flex gap-2">
+                        <button 
+                          (click)="editAddress($index)"
+                          class="btn btn-sm btn-outline"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          (click)="deleteAddress($index)"
+                          class="btn btn-sm btn-danger"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else if (!showAddressFormSignal()) {
+              <p class="text-gray-600 text-center py-8">No addresses yet. Add one to get started.</p>
+            }
+          </div>
+
+          <!-- Password Section -->
+          <div class="card">
+            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                Change Password
+              </div>
+              @if (!showPasswordFormSignal()) {
+                <button 
+                  (click)="showPasswordFormSignal.set(true)"
+                  class="btn btn-sm btn-outline"
+                >
+                  Change
+                </button>
+              }
+            </h3>
+
+            @if (showPasswordFormSignal()) {
+              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="space-y-4">
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Current Password</label>
+                  <input
+                    formControlName="currentPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
+                  <input
+                    formControlName="newPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                  <p class="text-xs text-gray-500 mt-1">At least 8 characters</p>
+                </div>
+
+                <div>
+                  <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+                  <input
+                    formControlName="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+
+                <div class="flex gap-3">
+                  <button
+                    type="submit"
+                    [disabled]="passwordForm.invalid || savingSignal()"
+                    class="flex-1 btn btn-primary"
+                  >
+                    Update Password
+                  </button>
+                  <button
+                    type="button"
+                    (click)="showPasswordFormSignal.set(false)"
+                    class="flex-1 btn btn-outline"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            } @else {
+              <p class="text-gray-600">Keep your account secure with a strong password.</p>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </main>
+</div>

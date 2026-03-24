@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Form animations
+form {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.card {
+  animation: fadeIn 0.3s ease-out;
+  
+  &:hover {
+    @media (min-width: 768px) {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Button transitions
+button {
+  transition: all 0.2s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+// Input transitions
+input,
+select,
+textarea {
+  transition: all 0.2s ease;
+  
+  &:focus {
+    border-color: var(--primary-color);
+  }
+}
+
+// Avatar styling
+.w-24 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+// Address form styling
+.border-2 {
+  &.border-primary-200 {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+  }
+}
+
+// Badge styling
+.bg-green-100 {
+  animation: fadeIn 0.2s ease;
+}
+
+// Default indicator
+.text-xs.font-bold {
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .lg\:col-span-1,
+  .lg\:col-span-2 {
+    grid-column: span 1;
+  }
+}

@@ -36,9 +36,10 @@ export class DriversComponent implements OnInit {
   load(): void {
     const userId = this.authSession.user()?.id;
 
-    this.driversApi.findAll().subscribe((drivers) => {
-      this.drivers.set(drivers);
-      this.myDriver.set(drivers.find((driver) => driver.userId === userId) ?? null);
+    this.driversApi.findAll().subscribe((response) => {
+      const drivers = Array.isArray(response) ? response : response.drivers;
+      this.drivers.set(drivers as Driver[]);
+      this.myDriver.set((drivers as Driver[]).find((driver: Driver) => driver.userId === userId) ?? null);
     });
   }
 

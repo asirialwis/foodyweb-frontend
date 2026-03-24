@@ -1,36 +1,284 @@
-<section class="heading">
-  <h1>Restaurant workspace</h1>
-  <p>Create and manage storefront details.</p>
-</section>
-
-<form class="create-form" [formGroup]="form" (ngSubmit)="create()">
-  <input formControlName="name" placeholder="Restaurant name" />
-  <input formControlName="cuisine" placeholder="Cuisine (comma separated)" />
-  <input formControlName="phone" placeholder="Phone" />
-  <input formControlName="city" placeholder="City" />
-
-  @if (isAdmin()) {
-    <input formControlName="ownerId" placeholder="Owner user ID" />
-  }
-
-  <button type="submit" [disabled]="form.invalid">Create restaurant</button>
-</form>
-
-<section class="list">
-  @for (restaurant of restaurants(); track restaurant._id ?? restaurant.id ?? restaurant.name) {
-    <article>
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
       <div>
-        <h3>{{ restaurant.name }}</h3>
-        <p>{{ restaurant.cuisine?.join(', ') || 'No cuisines listed' }}</p>
-        <small>{{ restaurant.phone || 'No phone' }}</small>
+        <h1 class="text-3xl font-bold text-gray-900">Restaurant Dashboard</h1>
+        <p class="text-gray-600 mt-1">Manage your restaurants and menus</p>
       </div>
+      <button 
+        (click)="showRestaurantFormSignal.set(true)"
+        class="btn btn-primary"
+      >
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        New Restaurant
+      </button>
+    </div>
+  </header>
 
-      <div class="actions">
-        <button type="button" (click)="toggleActive(restaurant)">
-          {{ restaurant.isActive === false ? 'Activate' : 'Deactivate' }}
-        </button>
-        <button type="button" class="danger" (click)="remove(restaurant)">Delete</button>
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+      <div class="card">
+        <p class="text-gray-600 text-sm">Total Restaurants</p>
+        <p class="text-3xl font-bold text-gray-900">{{ stats().totalRestaurants }}</p>
       </div>
-    </article>
-  }
-</section>
+      <div class="card">
+        <p class="text-gray-600 text-sm">Menu Items</p>
+        <p class="text-3xl font-bold text-gray-900">{{ stats().totalMenuItems }}</p>
+      </div>
+      <div class="card">
+        <p class="text-gray-600 text-sm">Open Restaurants</p>
+        <p class="text-3xl font-bold text-gray-900">{{ stats().openRestaurants }}</p>
+      </div>
+      <div class="card">
+        <p class="text-gray-600 text-sm">Avg Rating</p>
+        <p class="text-3xl font-bold text-gray-900">{{ stats().avgRating }} ⭐</p>
+      </div>
+    </div>
+
+    <!-- Restaurants List or Detail View -->
+    @if (!selectedRestaurantSignal()) {
+      @if (loadingSignal()) {
+        <div class="text-center py-12">
+          <div class="w-12 h-12 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin mx-auto"></div>
+          <p class="text-gray-600 mt-4">Loading restaurants...</p>
+        </div>
+      } @else if (restaurantsSignal().length === 0) {
+        <div class="card text-center py-12">
+          <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5.582a2 2 0 00-1.682.931m0 0A6.001 6.001 0 007 21m15 0H4m0 0a6.002 6.002 0 01-.82-3.907m15.82 3.907H4m0 0A5.973 5.973 0 017 19m0 0A5.972 5.972 0 019 10m0 0A5.972 5.972 0 0115 10m0 0A5.973 5.973 0 0117 19" />
+          </svg>
+          <h3 class="text-lg font-semibold text-gray-900 mt-4">No restaurants yet</h3>
+          <p class="text-gray-600 mt-1">Create your first restaurant to get started</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (restaurant of restaurantsSignal(); track restaurant._id) {
+            <div class="card cursor-pointer hover:shadow-lg transition" (click)="selectRestaurant(restaurant)">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-900">{{ restaurant.name }}</h3>
+                @if (restaurant.isOpen) {
+                  <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">OPEN</span>
+                } @else {
+                  <span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-1 rounded">CLOSED</span>
+                }
+              </div>
+              <p class="text-gray-600 text-sm mb-2">{{ restaurant.description }}</p>
+              <div class="space-y-2 text-sm text-gray-600 mb-4">
+                <p>⭐ {{ restaurant.rating?.toFixed(1) || 'N/A' }} Rating</p>
+                <p>📍 {{ restaurant.address?.city }}, {{ restaurant.address?.state }}</p>
+                <p>⏱ {{ restaurant.deliveryTime }} mins delivery</p>
+              </div>
+              <button 
+                (click)="selectRestaurant(restaurant); $event.stopPropagation()"
+                class="w-full btn btn-primary btn-sm"
+              >
+                Manage →
+              </button>
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <!-- Restaurant Detail View -->
+      <div>
+        <button 
+          (click)="selectedRestaurantSignal.set(null)"
+          class="mb-6 btn btn-ghost"
+        >
+          ← Back to Restaurants
+        </button>
+
+        <!-- Tabs -->
+        <div class="flex gap-2 mb-6 border-b border-gray-200">
+          @for (tab of tabs; track tab) {
+            <button 
+              (click)="setTab(tab)"
+              [ngClass]="activeTabSignal() === tab ? 'border-b-2 border-primary-500 text-primary-600' : 'text-gray-600 hover:text-gray-900'"
+              class="px-4 py-3 font-semibold transition"
+            >
+              {{ tab | titlecase }}
+            </button>
+          }
+        </div>
+
+        <!-- Overview Tab -->
+        @if (activeTabSignal() === 'overview') {
+          <div class="card">
+            <div class="flex items-start justify-between mb-6">
+              <div>
+                <h2 class="text-2xl font-bold text-gray-900">{{ selectedRestaurantSignal()?.name }}</h2>
+                <p class="text-gray-600 mt-2">{{ selectedRestaurantSignal()?.description }}</p>
+              </div>
+              <button 
+                (click)="showRestaurantFormSignal.set(true)"
+                class="btn btn-sm btn-outline"
+              >
+                Edit Restaurant
+              </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <p class="text-gray-600 text-sm">Phone</p>
+                <p class="font-semibold">{{ selectedRestaurantSignal()?.phone }}</p>
+              </div>
+              <div>
+                <p class="text-gray-600 text-sm">Email</p>
+                <p class="font-semibold">{{ selectedRestaurantSignal()?.email }}</p>
+              </div>
+              <div>
+                <p class="text-gray-600 text-sm">Delivery Time</p>
+                <p class="font-semibold">{{ selectedRestaurantSignal()?.deliveryTime }} mins</p>
+              </div>
+              <div>
+                <p class="text-gray-600 text-sm">Delivery Fee</p>
+                <p class="font-semibold">₹{{ selectedRestaurantSignal()?.deliveryFee }}</p>
+              </div>
+            </div>
+
+            <div>
+              <p class="text-gray-600 text-sm mb-2">Cuisines</p>
+              <div class="flex flex-wrap gap-2">
+                @for (cuisine of selectedRestaurantSignal()?.cuisine || []; track cuisine) {
+                  <span class="badge">{{ cuisine }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Menu Tab -->
+        @if (activeTabSignal() === 'menu') {
+          <div>
+            <button 
+              (click)="showMenuFormSignal.set(true); editingMenuItemSignal.set(null)"
+              class="mb-6 btn btn-primary"
+            >
+              + Add Menu Item
+            </button>
+
+            @if (menuItemsSignal().length === 0) {
+              <div class="card text-center py-8">
+                <p class="text-gray-600">No menu items yet. Add your first item!</p>
+              </div>
+            } @else {
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @for (item of menuItemsSignal(); track item._id) {
+                  <div class="card">
+                    <div class="flex items-start justify-between mb-3">
+                      <h4 class="font-bold text-gray-900">{{ item.name }}</h4>
+                      <span class="text-lg font-bold text-primary-600">₹{{ item.price }}</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4">{{ item.description }}</p>
+                    <div class="flex gap-2">
+                      <button 
+                        (click)="editMenuItem(item)"
+                        class="flex-1 btn btn-sm btn-outline"
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        (click)="deleteMenuItem((item._id ?? item.id)!)"
+                        class="flex-1 btn btn-sm btn-danger"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Add/Edit Forms Modal -->
+        @if (showRestaurantFormSignal()) {
+          <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div class="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
+                <h2 class="text-2xl font-bold">{{ selectedRestaurantSignal() ? 'Edit' : 'Create' }} Restaurant</h2>
+                <button (click)="showRestaurantFormSignal.set(false)" class="text-gray-400 hover:text-gray-600">✕</button>
+              </div>
+              <form [formGroup]="restaurantForm" (ngSubmit)="saveRestaurant()" class="p-6 space-y-4">
+                <input formControlName="name" placeholder="Restaurant Name" class="w-full px-4 py-2 border rounded-lg" />
+                <textarea formControlName="description" placeholder="Description" rows="3" class="w-full px-4 py-2 border rounded-lg"></textarea>
+                <input formControlName="phone" placeholder="Phone (10 digits)" class="w-full px-4 py-2 border rounded-lg" />
+                <input formControlName="email" placeholder="Email" class="w-full px-4 py-2 border rounded-lg" />
+                <input formControlName="address" placeholder="Street Address" class="w-full px-4 py-2 border rounded-lg" />
+                <div class="grid grid-cols-3 gap-2">
+                  <input formControlName="city" placeholder="City" class="px-4 py-2 border rounded-lg" />
+                  <input formControlName="state" placeholder="State" class="px-4 py-2 border rounded-lg" />
+                  <input formControlName="zipCode" placeholder="Zip" class="px-4 py-2 border rounded-lg" />
+                </div>
+                <input formControlName="deliveryTime" type="number" placeholder="Delivery Time (mins)" class="w-full px-4 py-2 border rounded-lg" />
+                <input formControlName="deliveryFee" type="number" step="0.5" placeholder="Delivery Fee" class="w-full px-4 py-2 border rounded-lg" />
+                
+                <div>
+                  <label class="text-sm font-semibold mb-2 block">Cuisines</label>
+                  <div class="grid grid-cols-3 gap-2">
+                    @for (cuisine of cuisines; track cuisine) {
+                      <button
+                        type="button"
+                        (click)="toggleCuisine(cuisine)"
+                        [ngClass]="restaurantForm.get('cuisines')?.value?.includes(cuisine) ? 'btn-primary' : 'btn-outline'"
+                        class="btn btn-sm"
+                      >
+                        {{ cuisine }}
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <div class="flex gap-3">
+                  <button type="submit" [disabled]="restaurantForm.invalid || savingSignal()" class="flex-1 btn btn-primary">Save</button>
+                  <button type="button" (click)="showRestaurantFormSignal.set(false)" class="flex-1 btn btn-outline">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        }
+
+        @if (showMenuFormSignal()) {
+          <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto">
+              <div class="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
+                <h2 class="text-2xl font-bold">{{ editingMenuItemSignal() ? 'Edit' : 'Add' }} Menu Item</h2>
+                <button (click)="showMenuFormSignal.set(false)" class="text-gray-400 hover:text-gray-600">✕</button>
+              </div>
+              <form [formGroup]="menuItemForm" (ngSubmit)="saveMenuItem()" class="p-6 space-y-4">
+                <input formControlName="name" placeholder="Item Name" class="w-full px-4 py-2 border rounded-lg" />
+                <textarea formControlName="description" placeholder="Description" rows="2" class="w-full px-4 py-2 border rounded-lg"></textarea>
+                <input formControlName="price" type="number" step="0.5" placeholder="Price" class="w-full px-4 py-2 border rounded-lg" />
+                <input formControlName="category" placeholder="Category" class="w-full px-4 py-2 border rounded-lg" />
+                
+                <div class="space-y-2">
+                  <label class="flex items-center">
+                    <input type="checkbox" formControlName="isVegetarian" class="w-4 h-4 mr-2" />
+                    <span>Vegetarian</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" formControlName="isVegan" class="w-4 h-4 mr-2" />
+                    <span>Vegan</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" formControlName="isSpicy" class="w-4 h-4 mr-2" />
+                    <span>Spicy</span>
+                  </label>
+                </div>
+
+                <div class="flex gap-3">
+                  <button type="submit" [disabled]="menuItemForm.invalid || savingSignal()" class="flex-1 btn btn-primary">Save</button>
+                  <button type="button" (click)="showMenuFormSignal.set(false)" class="flex-1 btn btn-outline">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

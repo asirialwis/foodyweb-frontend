@@ -2,12 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { forkJoin, of, switchMap } from 'rxjs';
 import { OrdersApiService } from '../../core/api/orders-api.service';
 import { RestaurantsApiService } from '../../core/api/restaurants-api.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { NotificationService } from '../../core/services/notification.service';
-import { Order, OrderStatus, PaymentStatus } from '../../core/models/types';
+import { Order, OrderStatus } from '../../core/models/types';
 
 @Component({
   selector: 'app-orders',
@@ -22,39 +21,160 @@ export class OrdersComponent implements OnInit {
   private readonly authSession = inject(AuthSessionService);
   private readonly notification = inject(NotificationService);
 
-  statusFilter = '';
-  readonly orders = signal<Order[]>([]);
+  readonly ordersSignal = signal<Order[]>([]);
+  readonly loadingSignal = signal(false);
+  readonly statusFilterSignal = signal<OrderStatus | ''>('');
+  readonly sortBySignal = signal<'newest' | 'oldest' | 'status'>('newest');
+  readonly selectedOrderSignal = signal<Order | null>(null);
+  readonly showDetailsSignal = signal(false);
 
   readonly role = computed(() => this.authSession.user()?.role ?? 'customer');
+  readonly userId = computed(() => this.authSession.user()?.id ?? '');
 
   readonly pageTitle = computed(() => {
-    if (this.role() === 'restaurant_owner') {
-      return 'Restaurant orders';
+    switch (this.role()) {
+      case 'restaurant_owner':
+        return 'Restaurant Orders';
+      case 'delivery_driver':
+        return 'Delivery Orders';
+      case 'admin':
+        return 'All Orders';
+      default:
+        return 'My Orders';
     }
-    if (this.role() === 'delivery_driver') {
-      return 'Delivery-linked orders';
-    }
-    if (this.role() === 'admin') {
-      return 'All platform orders';
-    }
-    return 'Your orders';
   });
 
   readonly pageSubtitle = computed(() => {
-    if (this.role() === 'restaurant_owner') {
-      return 'Track incoming demand and update preparation states.';
+    switch (this.role()) {
+      case 'restaurant_owner':
+        return 'Track and manage incoming orders';
+      case 'delivery_driver':
+        return 'View and track deliveries';
+      case 'admin':
+        return 'Monitor all platform orders';
+      default:
+        return 'View your order history and track deliveries';
     }
-    if (this.role() === 'delivery_driver') {
-      return 'View active orders related to your delivery work.';
-    }
-    if (this.role() === 'admin') {
-      return 'Monitor all order activity across the platform.';
-    }
-    return 'Track status, payments, and delivery progress.';
   });
+
+  readonly filteredOrders = computed(() => {
+    let filtered = this.ordersSignal();
+    
+    if (this.statusFilterSignal()) {
+      filtered = filtered.filter(o => o.status === this.statusFilterSignal());
+    }
+
+    const sorted = [...filtered];
+    switch (this.sortBySignal()) {
+      case 'oldest':
+        return sorted.reverse();
+      case 'status':
+        return sorted.sort((a, b) => (a.status || '').localeCompare(b.status || ''));
+      case 'newest':
+      default:
+        return sorted;
+    }
+  });
+
+  readonly totalOrders = computed(() => this.filteredOrders().length);
+  readonly deliveredOrders = computed(() => 
+    this.ordersSignal().filter(o => o.status === 'delivered').length
+  );
+  readonly activeOrders = computed(() => 
+    this.ordersSignal().filter(o => !['delivered', 'cancelled'].includes(o.status ?? 'pending')).length
+  );
+
+  readonly statusBadgeClass = (status: OrderStatus | undefined): string => {
+    const baseClass = 'px-3 py-1 rounded-full text-sm font-semibold';
+    const safeStatus = status ?? 'pending';
+    switch (safeStatus) {
+      case 'pending':
+        return `${baseClass} bg-yellow-100 text-yellow-800`;
+      case 'confirmed':
+        return `${baseClass} bg-blue-100 text-blue-800`;
+      case 'preparing':
+        return `${baseClass} bg-purple-100 text-purple-800`;
+      case 'ready':
+        return `${baseClass} bg-green-100 text-green-800`;
+      case 'picked_up':
+        return `${baseClass} bg-cyan-100 text-cyan-800`;
+      case 'in_transit':
+        return `${baseClass} bg-orange-100 text-orange-800`;
+      case 'delivered':
+        return `${baseClass} bg-green-100 text-green-800`;
+      case 'cancelled':
+        return `${baseClass} bg-red-100 text-red-800`;
+      default:
+        return baseClass;
+    }
+  };
+
+  readonly statusIcon = (status: OrderStatus | undefined): string => {
+    const safeStatus = status ?? 'pending';
+    switch (safeStatus) {
+      case 'pending': return '⏳';
+      case 'confirmed': return '✓';
+      case 'preparing': return '👨‍🍳';
+      case 'ready': return '📦';
+      case 'picked_up': return '🚗';
+      case 'in_transit': return '🚚';
+      case 'delivered': return '✅';
+      case 'cancelled': return '❌';
+      default: return '•';
+    }
+  };
+
+  getOrderShortId(orderId?: string): string {
+    if (!orderId) return '';
+    return orderId.substring(Math.max(0, orderId.length - 8)).toUpperCase();
+  }
 
   ngOnInit(): void {
     this.loadOrders();
+  }
+
+  loadOrders(): void {
+    this.loadingSignal.set(true);
+    this.ordersApi.getMyOrders().subscribe({
+      next: (orders) => {
+        this.ordersSignal.set(orders);
+      },
+      error: (err: any) => {
+        this.notification.error('Failed to load orders', err?.error?.message);
+        this.loadingSignal.set(false);
+      },
+      complete: () => {
+        this.loadingSignal.set(false);
+      },
+    });
+  }
+
+  selectOrder(order: Order): void {
+    this.selectedOrderSignal.set(order);
+    this.showDetailsSignal.set(true);
+  }
+
+  closeDetails(): void {
+    this.showDetailsSignal.set(false);
+    setTimeout(() => this.selectedOrderSignal.set(null), 300);
+  }
+
+  cancelOrder(order: Order): void {
+    if (!confirm('Are you sure you want to cancel this order?')) return;
+    
+    const orderId = order._id ?? order.id;
+    if (!orderId) return;
+    
+    this.ordersApi.cancel(orderId).subscribe({
+      next: () => {
+        this.notification.success('Order cancelled', 'Your order has been cancelled');
+        this.loadOrders();
+        this.closeDetails();
+      },
+      error: (err: any) => {
+        this.notification.error('Cannot cancel', err?.error?.message || 'This order cannot be cancelled');
+      },
+    });
   }
 
   canCreateOrder(): boolean {
@@ -65,10 +185,6 @@ export class OrdersComponent implements OnInit {
     return this.role() === 'restaurant_owner' || this.role() === 'admin';
   }
 
-  canManagePayment(): boolean {
-    return this.role() === 'admin';
-  }
-
   canCancel(order: Order): boolean {
     if (this.role() === 'customer') {
       return ['pending', 'confirmed', 'preparing'].includes(order.status ?? 'pending');
@@ -76,93 +192,27 @@ export class OrdersComponent implements OnInit {
     return this.role() === 'admin';
   }
 
-  loadOrders(): void {
-    const user = this.authSession.user();
-    const role = this.role();
-    const status = this.statusFilter ? (this.statusFilter as OrderStatus) : undefined;
-
-    if (!user) {
-      this.orders.set([]);
+  rateOrder(order: Order): void {
+    const rating = prompt('Rate this order (1-5 stars):', '5');
+    if (!rating) return;
+    
+    const orderId = order._id ?? order.id;
+    if (!orderId) return;
+    
+    const stars = parseInt(rating);
+    if (isNaN(stars) || stars < 1 || stars > 5) {
+      this.notification.error('Invalid rating', 'Please provide a rating between 1 and 5');
       return;
     }
 
-    if (role === 'customer') {
-      this.ordersApi
-        .findAll({ userId: user.id, status, page: 1, limit: 100 })
-        .subscribe((orders) => this.orders.set(orders));
-      return;
-    }
-
-    if (role === 'restaurant_owner') {
-      this.restaurantsApi
-        .findAll()
-        .pipe(
-          switchMap((restaurants) => {
-            const ownedIds = restaurants
-              .filter((restaurant) => restaurant.ownerId === user.id)
-              .map((restaurant) => restaurant._id ?? restaurant.id)
-              .filter((id): id is string => !!id);
-
-            if (!ownedIds.length) {
-              return of([] as Order[]);
-            }
-
-            return forkJoin(
-              ownedIds.map((restaurantId) =>
-                this.ordersApi.findAll({
-                  restaurantId,
-                  status,
-                  page: 1,
-                  limit: 100,
-                }),
-              ),
-            ).pipe(
-              switchMap((orderGroups) => of(orderGroups.flat())),
-            );
-          }),
-        )
-        .subscribe((orders) => this.orders.set(orders));
-      return;
-    }
-
-    this.ordersApi
-      .findAll({ status, page: 1, limit: 200 })
-      .subscribe((orders) => this.orders.set(orders));
-  }
-
-  updateStatus(order: Order, status: string): void {
-    const id = order._id ?? order.id;
-    if (!id) {
-      return;
-    }
-
-    this.ordersApi.updateStatus(id, status as OrderStatus).subscribe(() => {
-      this.notification.show({ type: 'success', text: 'Order status updated' });
-      this.loadOrders();
-    });
-  }
-
-  updatePayment(order: Order, payment: string): void {
-    const id = order._id ?? order.id;
-    if (!id) {
-      return;
-    }
-
-    this.ordersApi.updatePaymentStatus(id, payment as PaymentStatus).subscribe(() => {
-      this.notification.show({ type: 'success', text: 'Payment updated' });
-      this.loadOrders();
-    });
-  }
-
-  cancel(order: Order): void {
-    const id = order._id ?? order.id;
-    if (!id) {
-      return;
-    }
-
-    this.ordersApi.cancel(id).subscribe(() => {
-      this.notification.show({ type: 'info', text: 'Order cancelled' });
-      this.loadOrders();
+    this.ordersApi.rateOrder(orderId, { rating: stars, comment: '' } as any).subscribe({
+      next: () => {
+        this.notification.success('Thank you!', 'Your rating has been recorded');
+        this.loadOrders();
+      },
+      error: (err: any) => {
+        this.notification.error('Failed to rate order', err?.error?.message);
+      },
     });
   }
 }

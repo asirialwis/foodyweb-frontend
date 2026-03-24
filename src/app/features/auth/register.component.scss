@@ -1,33 +1,86 @@
 :host {
   display: block;
-  min-height: 100vh;
-  background: linear-gradient(120deg, #1f2937, #111827);
 }
 
-.auth-page {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 480px;
-  align-items: center;
-  gap: 2rem;
-  max-width: 1150px;
-  margin: 0 auto;
-  padding: 1.5rem;
+// Custom animations for the page
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.hero {
-  color: #fff;
+// Animate form elements
+form {
+  animation: slideInUp 0.5s ease-out;
 }
 
-.hero h1 {
-  font-size: clamp(2rem, 4vw, 3.3rem);
-  margin-bottom: 0.7rem;
+// Focus ring styling for better UX
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
 }
 
-.hero p {
-  color: #d1d5db;
-  max-width: 530px;
+// Password visibility button
+button[type="button"] {
+  &:hover {
+    svg {
+      opacity: 0.7;
+    }
+  }
 }
+
+// User type selection buttons
+.btn {
+  transition: all 0.2s ease;
+  
+  &.btn-primary {
+    animation: scaleIn 0.2s ease;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Password requirements box styling
+.bg-gray-50 {
+  border: 1px solid #e5e7eb;
+}
+
+// Form error states
+.border-red-500 {
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+// Checkbox styling
+input[type="checkbox"] {
+  cursor: pointer;
+  
+  &:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+}
+
 
 .card {
   background: #fff;

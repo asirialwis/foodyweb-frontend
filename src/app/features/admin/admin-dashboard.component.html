@@ -1,0 +1,441 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <header class="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+        <p class="text-gray-600 mt-1">System overview and management</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Tab Navigation -->
+    <div class="mb-8 flex gap-2 flex-wrap border-b border-gray-200">
+      <button
+        *ngFor="let tab of ['overview', 'users', 'orders', 'deliveries', 'drivers', 'restaurants']"
+        (click)="setActiveTab(tab)"
+        [class.border-b-2]="activeTabSignal() === tab"
+        [class.border-primary-500]="activeTabSignal() === tab"
+        [class.text-primary-600]="activeTabSignal() === tab"
+        [class.text-gray-600]="activeTabSignal() !== tab"
+        class="px-4 py-3 text-sm font-medium capitalize transition-colors hover:text-gray-900"
+      >
+        {{ tab }}
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingSignal()" class="flex justify-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+    </div>
+
+    <!-- Overview Tab -->
+    <div *ngIf="activeTabSignal() === 'overview' && !loadingSignal()" class="space-y-8">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Total Users -->
+        <div class="card bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-500">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Total Users</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ dashboardStatsSignal().totalUsers }}</p>
+            </div>
+            <span class="text-3xl">👥</span>
+          </div>
+          <p class="text-gray-500 text-xs mt-4">Registered users</p>
+        </div>
+
+        <!-- Total Restaurants -->
+        <div class="card bg-white rounded-lg shadow-md p-6 border-l-4 border-secondary-500">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Restaurants</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ dashboardStatsSignal().totalRestaurants }}</p>
+            </div>
+            <span class="text-3xl">🍽️</span>
+          </div>
+          <p class="text-gray-500 text-xs mt-4">Active restaurants</p>
+        </div>
+
+        <!-- Total Drivers -->
+        <div class="card bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Drivers</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ dashboardStatsSignal().totalDrivers }}</p>
+            </div>
+            <span class="text-3xl">🚗</span>
+          </div>
+          <p class="text-gray-500 text-xs mt-4">Active drivers</p>
+        </div>
+
+        <!-- Active Orders -->
+        <div class="card bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Active Orders</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ dashboardStatsSignal().activeOrders }}</p>
+            </div>
+            <span class="text-3xl">📦</span>
+          </div>
+          <p class="text-gray-500 text-xs mt-4">In progress</p>
+        </div>
+
+        <!-- Total Revenue -->
+        <div class="card bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Total Revenue</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ formatCurrency(dashboardStatsSignal().totalRevenue) }}</p>
+            </div>
+            <span class="text-3xl">💵</span>
+          </div>
+          <p class="text-gray-500 text-xs mt-4">All time</p>
+        </div>
+
+        <!-- Avg Delivery Time -->
+        <div class="card bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-gray-600 text-sm font-medium">Avg Delivery Time</p>
+              <p class="text-3xl font-bold text-gray-900 mt-2">{{ dashboardStatsSignal().avgDeliveryTime.toFixed(0) }}m</p>
+            </div>
+            <span class="text-3xl">⏱️</span>
+          </div>
+          <p class="text-gray-500 text-xs mt-4">Minutes</p>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Orders</h2>
+        <div class="space-y-3">
+          <div *ngFor="let order of ordersSignal().slice(0, 5)" class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
+            <div class="flex-1">
+              <p class="font-medium text-gray-900">Order #{{ order.id?.slice(-6) }}</p>
+              <p class="text-sm text-gray-600">{{ order.createdAt | date : 'short' }}</p>
+            </div>
+            <span [class]="'px-3 py-1 rounded-full text-sm font-medium ' + getStatusBadgeClass(order.status)">
+              {{ getStatusIcon(order.status) }} {{ order.status | titlecase }}
+            </span>
+            <p class="ml-4 font-bold text-gray-900">{{ formatCurrency(order.totalAmount || 0) }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Tab -->
+    <div *ngIf="activeTabSignal() === 'users' && !loadingSignal()" class="space-y-6">
+      <div class="flex gap-4 mb-6">
+        <input
+          type="text"
+          placeholder="Search users..."
+          [value]="userSearchSignal()"
+          (input)="userSearchSignal.set($any($event.target).value)"
+          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+        />
+      </div>
+
+      <button
+        class="px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+      >
+        + Add User
+      </button>
+
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Email</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Role</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let user of filteredUsers()"
+              class="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+              (click)="selectUser(user)"
+            >
+              <td class="px-6 py-4 text-sm text-gray-900">{{ user.firstName }} {{ user.lastName }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ user.email }}</td>
+              <td class="px-6 py-4 text-sm">
+                <span class="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                  {{ user.role | titlecase }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm">
+                <span
+                  [class]="user.isVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                  class="px-2 py-1 rounded text-xs font-medium"
+                >
+                  {{ user.isVerified ? '✅ Verified' : '❌ Unverified' }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm">
+                <button
+                  (click)="toggleUserVerification(user); $event.stopPropagation()"
+                  [disabled]="savingSignal()"
+                  class="text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50"
+                >
+                  {{ user.isVerified ? 'Unverify' : 'Verify' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="filteredUsers().length === 0" class="p-6 text-center text-gray-600">
+          No users found
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Tab -->
+    <div *ngIf="activeTabSignal() === 'orders' && !loadingSignal()" class="space-y-6">
+      <div class="flex gap-4">
+        <select
+          [value]="orderStatusFilterSignal()"
+          (change)="orderStatusFilterSignal.set($any($event.target).value)"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+        >
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="preparing">Preparing</option>
+          <option value="ready">Ready</option>
+          <option value="picked_up">Picked Up</option>
+          <option value="in_transit">In Transit</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Order ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Customer</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Amount</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let order of filteredOrders()"
+              class="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+              (click)="selectOrder(order)"
+            >
+              <td class="px-6 py-4 text-sm font-medium text-gray-900">#{{ order.id?.slice(-6) }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ order.userId || 'N/A' }}</td>
+              <td class="px-6 py-4 text-sm">
+                <span [class]="'px-3 py-1 rounded-full text-xs font-medium ' + getStatusBadgeClass(order.status)">
+                  {{ getStatusIcon(order.status) }} {{ order.status | titlecase }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ formatCurrency(order.totalAmount || 0) }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ order.createdAt | date : 'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="filteredOrders().length === 0" class="p-6 text-center text-gray-600">
+          No orders found
+        </div>
+      </div>
+    </div>
+
+    <!-- Deliveries Tab -->
+    <div *ngIf="activeTabSignal() === 'deliveries' && !loadingSignal()" class="space-y-6">
+      <div class="flex gap-4">
+        <select
+          [value]="deliveryStatusFilterSignal()"
+          (change)="deliveryStatusFilterSignal.set($any($event.target).value)"
+          class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+        >
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="assigned">Assigned</option>
+          <option value="picked_up">Picked Up</option>
+          <option value="in_transit">In Transit</option>
+          <option value="delivered">Delivered</option>
+          <option value="failed">Failed</option>
+        </select>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Delivery ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Driver</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Fee</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let delivery of filteredDeliveries()"
+              class="border-b border-gray-200 hover:bg-gray-50 cursor-pointer"
+              (click)="selectDelivery(delivery)"
+            >
+              <td class="px-6 py-4 text-sm font-medium text-gray-900">#{{ delivery.id?.slice(-6) }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ delivery.driverId || 'Unassigned' }}</td>
+              <td class="px-6 py-4 text-sm">
+                <span [class]="'px-3 py-1 rounded-full text-xs font-medium ' + getStatusBadgeClass(delivery.status)">
+                  {{ getStatusIcon(delivery.status) }} {{ delivery.status | titlecase }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm font-bold text-gray-900">{{ formatCurrency(delivery.deliveryFee || 0) }}</td>
+              <td class="px-6 py-4 text-sm text-gray-600">{{ delivery.createdAt | date : 'short' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="filteredDeliveries().length === 0" class="p-6 text-center text-gray-600">
+          No deliveries found
+        </div>
+      </div>
+    </div>
+
+    <!-- Drivers Tab -->
+    <div *ngIf="activeTabSignal() === 'drivers' && !loadingSignal()" class="space-y-6">
+      <button
+        class="px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+      >
+        + Add Driver
+      </button>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let driver of driversSignal()" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <p class="font-bold text-gray-900">{{ driver.firstName }} {{ driver.lastName }}</p>
+              <p class="text-sm text-gray-600">{{ driver.vehicleType | titlecase }}</p>
+            </div>
+            <span class="text-2xl">🚗</span>
+          </div>
+
+          <div class="space-y-2 mb-4 text-sm">
+            <p><span class="font-medium text-gray-700">Status:</span> {{ driver.isAvailable ? '🟢 Available' : '🔴 Unavailable' }}</p>
+            <p><span class="font-medium text-gray-700">Rating:</span> ⭐ {{ driver.rating || 5 }}</p>
+            <p><span class="font-medium text-gray-700">Deliveries:</span> {{ driver.totalDeliveries || 0 }}</p>
+            <p><span class="font-medium text-gray-700">Earnings:</span> {{ formatCurrency(driver.totalEarnings || 0) }}</p>
+          </div>
+
+          <button class="w-full px-4 py-2 bg-primary-100 text-primary-600 rounded-lg text-sm font-medium hover:bg-primary-200 transition-colors">
+            View Details
+          </button>
+        </div>
+      </div>
+      <div *ngIf="driversSignal().length === 0" class="bg-white rounded-lg shadow-md p-12 text-center text-gray-600">
+        No drivers found
+      </div>
+    </div>
+
+    <!-- Restaurants Tab -->
+    <div *ngIf="activeTabSignal() === 'restaurants' && !loadingSignal()" class="space-y-6">
+      <button
+        class="px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-colors"
+      >
+        + Add Restaurant
+      </button>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let restaurant of restaurantsSignal()" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+          <div class="mb-4">
+            <p class="font-bold text-gray-900 text-lg">{{ restaurant.name }}</p>
+            <p class="text-sm text-gray-600">{{ restaurant.cuisine?.join(', ') || 'Various' }}</p>
+          </div>
+
+          <div class="space-y-2 mb-4 text-sm">
+            <p class="text-gray-700">{{ restaurant.description?.substring(0, 80) }}...</p>
+            <p><span class="font-medium text-gray-700">City:</span> {{ restaurant.address?.city || 'N/A' }}</p>
+            <p><span class="font-medium text-gray-700">Rating:</span> ⭐ {{ restaurant.rating || 4.5 }}</p>
+            <p>
+              <span class="font-medium text-gray-700">Status:</span>
+              <span [class]="restaurant.isOpen ? 'text-green-600' : 'text-red-600'">
+                {{ restaurant.isOpen ? '🟢 Open' : '🔴 Closed' }}
+              </span>
+            </p>
+          </div>
+
+          <button class="w-full px-4 py-2 bg-primary-100 text-primary-600 rounded-lg text-sm font-medium hover:bg-primary-200 transition-colors">
+            View Details
+          </button>
+        </div>
+      </div>
+      <div *ngIf="restaurantsSignal().length === 0" class="bg-white rounded-lg shadow-md p-12 text-center text-gray-600">
+        No restaurants found
+      </div>
+    </div>
+  </main>
+
+  <!-- User Detail Modal -->
+  <div
+    *ngIf="selectedUserSignal()"
+    class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+    (click)="closeModals()"
+  >
+    <div
+      class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-gray-900">User Details</h2>
+        <button (click)="closeModals()" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">✕</button>
+      </div>
+
+      <div class="p-6 space-y-6">
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">First Name</p>
+            <p class="text-gray-900">{{ selectedUserSignal()!.firstName }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Last Name</p>
+            <p class="text-gray-900">{{ selectedUserSignal()!.lastName }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Email</p>
+            <p class="text-gray-900">{{ selectedUserSignal()!.email }}</p>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Role</p>
+            <p class="text-gray-900">{{ selectedUserSignal()!.role | titlecase }}</p>
+          </div>
+        </div>
+
+        <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+          <p class="text-sm font-medium text-gray-700 mb-2">Verification Status</p>
+          <p [class]="selectedUserSignal()!.isVerified ? 'text-green-600' : 'text-red-600'" class="font-medium">
+            {{ selectedUserSignal()!.isVerified ? '✅ Verified' : '❌ Unverified' }}
+          </p>
+        </div>
+
+        <div class="flex gap-3 pt-6 border-t border-gray-200">
+          <button
+            (click)="toggleUserVerification(selectedUserSignal()!)"
+            [disabled]="savingSignal()"
+            class="flex-1 px-4 py-2 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 disabled:opacity-50 transition-colors"
+          >
+            {{ selectedUserSignal()!.isVerified ? 'Unverify' : 'Verify' }}
+          </button>
+          <button
+            (click)="deleteUser(selectedUserSignal()!)"
+            [disabled]="savingSignal()"
+            class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 disabled:opacity-50 transition-colors"
+          >
+            Delete
+          </button>
+          <button (click)="closeModals()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 transition-colors">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

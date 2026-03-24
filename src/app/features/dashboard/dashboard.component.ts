@@ -8,7 +8,7 @@ import { RestaurantsApiService } from '../../core/api/restaurants-api.service';
 import { UsersApiService } from '../../core/api/users-api.service';
 import { HealthApiService } from '../../core/api/health-api.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
-import { Delivery, HealthStatus } from '../../core/models/types';
+import { Delivery, HealthStatus, Driver, User, Order, Restaurant } from '../../core/models/types';
 import { DeliveriesApiService } from '../../core/api/deliveries-api.service';
 
 @Component({
@@ -120,12 +120,14 @@ export class DashboardComponent implements OnInit {
       next: (result) => this.statuses.set(Object.values(result)),
     });
 
-    this.restaurantsApi.findAll().subscribe((restaurants) => {
-      this.restaurantCount.set(restaurants.length);
+    this.restaurantsApi.findAll().subscribe((restaurantResponse) => {
+      const restaurants = Array.isArray(restaurantResponse) ? restaurantResponse : restaurantResponse.restaurants;
+      this.restaurantCount.set((restaurants as Restaurant[]).length);
     });
 
-    this.ordersApi.findAll({ limit: 100 }).subscribe((orders) => {
-      this.orderCount.set(orders.length);
+    this.ordersApi.findAll({ limit: 100 }).subscribe((orderResponse) => {
+      const orders = Array.isArray(orderResponse) ? orderResponse : orderResponse.orders;
+      this.orderCount.set((orders as Order[]).length);
     });
 
     if (this.role() === 'delivery_driver' && userId) {
@@ -133,20 +135,25 @@ export class DashboardComponent implements OnInit {
         deliveries: this.deliveriesApi.findAll(),
         drivers: this.driversApi.findAll({ isAvailable: true }),
       }).subscribe(({ deliveries, drivers }) => {
+        const delivericData = Array.isArray(deliveries) ? deliveries : deliveries.deliveries;
+        const driversData = Array.isArray(drivers) ? drivers : drivers.drivers;
         this.deliveryCount.set(
-          deliveries.filter((delivery: Delivery) => delivery.driverId === userId).length,
+          (delivericData as Delivery[]).filter((delivery: Delivery) => delivery.driverId === userId).length,
         );
-        this.onlineDriverCount.set(drivers.length);
+        this.onlineDriverCount.set((driversData as Driver[]).length);
       });
       return;
     }
 
-    this.deliveriesApi.findAll().subscribe((deliveries) => {
-      this.deliveryCount.set(deliveries.length);
+    this.deliveriesApi.findAll().subscribe((delivResponse) => {
+      const deliveries = Array.isArray(delivResponse) ? delivResponse : delivResponse.deliveries;
+      this.deliveryCount.set((deliveries as Delivery[]).length);
     });
 
     if (this.role() === 'admin') {
-      this.usersApi.findAll().subscribe((users) => this.userCount.set(users.length));
+      this.usersApi.findAll().subscribe((users) => {
+        this.userCount.set((users as User[]).length);
+      });
     }
   }
 }

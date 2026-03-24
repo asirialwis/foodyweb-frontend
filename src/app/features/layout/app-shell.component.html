@@ -14,9 +14,9 @@
     </div>
   </header>
 
-  @if (toast()) {
-    <div class="toast" [class.error]="toast()?.type === 'error'">
-      {{ toast()?.text }}
+  @if (currentToast()) {
+    <div class="toast" [class.error]="currentToast()?.type === 'error'">
+      {{ currentToast()?.text }}
     </div>
   }
 

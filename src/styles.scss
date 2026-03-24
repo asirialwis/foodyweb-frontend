@@ -1,1 +1,251 @@
-/* You can add global styles to this file, and also import other style files */
+/* Tailwind CSS Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global Styles */
+:root {
+  --color-primary: #0ea5e9;
+  --color-primary-dark: #0284c7;
+  --color-secondary: #f97316;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
+  
+  --transition-fast: 150ms ease-in-out;
+  --transition-base: 300ms ease-in-out;
+  --transition-slow: 500ms ease-in-out;
+}
+
+* {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+html, body {
+  @apply h-full m-0 p-0 bg-gray-50 text-gray-900 font-sans;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-bold text-gray-900;
+}
+
+h1 {
+  @apply text-3xl md:text-4xl;
+}
+
+h2 {
+  @apply text-2xl md:text-3xl;
+}
+
+h3 {
+  @apply text-xl md:text-2xl;
+}
+
+h4 {
+  @apply text-lg md:text-xl;
+}
+
+p {
+  @apply text-gray-600 leading-relaxed;
+}
+
+a {
+  @apply text-primary-500 hover:text-primary-600 transition-colors cursor-pointer;
+}
+
+/* Form Elements */
+input, textarea, select {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+}
+
+input:disabled, textarea:disabled, select:disabled {
+  @apply bg-gray-100 cursor-not-allowed opacity-60;
+}
+
+/* Buttons */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 font-semibold rounded-lg transition-all duration-300 cursor-pointer;
+}
+
+.btn-primary {
+  @apply bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
+}
+
+.btn-secondary {
+  @apply bg-secondary-500 text-white hover:bg-secondary-600 active:bg-secondary-700;
+}
+
+.btn-outline {
+  @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-50 active:bg-primary-100;
+}
+
+.btn-ghost {
+  @apply text-gray-700 hover:bg-gray-100 active:bg-gray-200;
+}
+
+.btn-danger {
+  @apply bg-danger-500 text-white hover:bg-danger-600 active:bg-danger-700;
+}
+
+.btn-success {
+  @apply bg-success-500 text-white hover:bg-success-600 active:bg-success-700;
+}
+
+.btn-disabled {
+  @apply opacity-50 cursor-not-allowed pointer-events-none;
+}
+
+.btn-sm {
+  @apply px-3 py-1 text-sm;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-lg;
+}
+
+/* Cards & Containers */
+.card {
+  @apply bg-white rounded-xl shadow-card hover:shadow-lg transition-shadow p-6;
+}
+
+.card-bordered {
+  @apply border border-gray-200;
+}
+
+.container-fluid {
+  @apply w-full px-4 md:px-6 lg:px-8;
+}
+
+/* Badges & Tags */
+.badge {
+  @apply inline-block px-3 py-1 rounded-full text-sm font-semibold;
+}
+
+.badge-primary {
+  @apply bg-primary-100 text-primary-700;
+}
+
+.badge-secondary {
+  @apply bg-secondary-100 text-secondary-700;
+}
+
+.badge-success {
+  @apply bg-success-100 text-success-700;
+}
+
+.badge-danger {
+  @apply bg-danger-100 text-danger-700;
+}
+
+.badge-warning {
+  @apply bg-warning-100 text-warning-700;
+}
+
+/* Loading States */
+.skeleton {
+  @apply bg-gray-200 animate-pulse rounded;
+}
+
+.loading-spinner {
+  @apply inline-block h-4 w-4 animate-spin rounded-full border-2 border-transparent border-r-current;
+}
+
+/* Grid & Layout */
+.grid-auto-fit {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6;
+}
+
+/* Flexbox utilities */
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-between {
+  @apply flex items-center justify-between;
+}
+
+/* Responsive utilities */
+@media (max-width: 640px) {
+  .hide-mobile {
+    @apply hidden;
+  }
+}
+
+@media (min-width: 641px) {
+  .show-mobile {
+    @apply hidden;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    @apply opacity-0 translate-y-4;
+  }
+  to {
+    @apply opacity-100 translate-y-0;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    @apply opacity-0 -translate-y-4;
+  }
+  to {
+    @apply opacity-100 translate-y-0;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    @apply scale-95 opacity-0;
+  }
+  to {
+    @apply scale-100 opacity-100;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.5s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded hover:bg-gray-500;
+}
+
+/* Selection styling */
+::selection {
+  @apply bg-primary-300 text-gray-900;
+}
+
+::-moz-selection {
+  @apply bg-primary-300 text-gray-900;
+}

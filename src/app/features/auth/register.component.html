@@ -1,48 +1,217 @@
-<div class="auth-page">
-  <div class="hero">
-    <h1>Create your FoodyWeb account.</h1>
-    <p>Order from local favorites, run your restaurant storefront, or deliver with ease.</p>
-  </div>
-
-  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
-    <div class="form-head">
-      <h2>Sign up</h2>
-      <p>Start ordering in minutes.</p>
-    </div>
-
-    <div class="grid">
-      <div class="field">
-        <label for="firstName">First Name</label>
-        <input id="firstName" formControlName="firstName" type="text" placeholder="John" />
+<div class="min-h-screen bg-gradient-to-br from-primary-50 via-white to-secondary-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-500 rounded-2xl mb-4">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+        </svg>
       </div>
-      <div class="field">
-        <label for="lastName">Last Name</label>
-        <input id="lastName" formControlName="lastName" type="text" placeholder="Doe" />
+      <h1 class="text-3xl font-bold text-gray-900">Join FoodyWeb</h1>
+      <p class="text-gray-600 mt-2">Create your account to get started</p>
+    </div>
+
+    <!-- User Type Selection -->
+    <div class="mb-6 flex gap-2">
+      <button
+        type="button"
+        (click)="setUserType('customer')"
+        [ngClass]="userTypeSignal() === 'customer' ? 'btn-primary' : 'btn-outline'"
+        class="flex-1 btn btn-sm"
+      >
+        👤 Customer
+      </button>
+      <button
+        type="button"
+        (click)="setUserType('restaurant')"
+        [ngClass]="userTypeSignal() === 'restaurant' ? 'btn-primary' : 'btn-outline'"
+        class="flex-1 btn btn-sm"
+      >
+        🏪 Restaurant
+      </button>
+      <button
+        type="button"
+        (click)="setUserType('driver')"
+        [ngClass]="userTypeSignal() === 'driver' ? 'btn-primary' : 'btn-outline'"
+        class="flex-1 btn btn-sm"
+      >
+        🚗 Driver
+      </button>
+    </div>
+
+    <!-- Registration Form -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="card space-y-4">
+      <!-- Name Fields -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="firstName" class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
+          <input
+            id="firstName"
+            formControlName="firstName"
+            type="text"
+            placeholder="John"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 transition"
+            [class.border-red-500]="form.get('firstName')?.touched && form.get('firstName')?.invalid"
+          />
+          @if (form.get('firstName')?.touched && firstNameError) {
+            <p class="text-red-500 text-xs mt-1">{{ firstNameError }}</p>
+          }
+        </div>
+        <div>
+          <label for="lastName" class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
+          <input
+            id="lastName"
+            formControlName="lastName"
+            type="text"
+            placeholder="Doe"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 transition"
+            [class.border-red-500]="form.get('lastName')?.touched && form.get('lastName')?.invalid"
+          />
+          @if (form.get('lastName')?.touched && lastNameError) {
+            <p class="text-red-500 text-xs mt-1">{{ lastNameError }}</p>
+          }
+        </div>
       </div>
-    </div>
 
-    <div class="field">
-      <label for="email">Email</label>
-      <input id="email" formControlName="email" type="email" placeholder="john@email.com" />
-    </div>
+      <!-- Email Field -->
+      <div>
+        <label for="email" class="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
+        <input
+          id="email"
+          formControlName="email"
+          type="email"
+          placeholder="you@example.com"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 transition"
+          [class.border-red-500]="form.get('email')?.touched && form.get('email')?.invalid"
+        />
+        @if (form.get('email')?.touched && emailError) {
+          <p class="text-red-500 text-xs mt-1">{{ emailError }}</p>
+        }
+      </div>
 
-    <div class="field">
-      <label for="phone">Phone</label>
-      <input id="phone" formControlName="phone" type="text" placeholder="+94 77 123 4567" />
-    </div>
+      <!-- Phone Field -->
+      <div>
+        <label for="phone" class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
+        <input
+          id="phone"
+          formControlName="phone"
+          type="tel"
+          placeholder="9876543210"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 transition"
+          [class.border-red-500]="form.get('phone')?.touched && form.get('phone')?.invalid"
+        />
+        @if (form.get('phone')?.touched && phoneError) {
+          <p class="text-red-500 text-xs mt-1">{{ phoneError }}</p>
+        }
+      </div>
 
-    <div class="field">
-      <label for="password">Password</label>
-      <input id="password" formControlName="password" type="password" placeholder="Minimum 6 characters" />
-    </div>
+      <!-- Password Field -->
+      <div>
+        <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">Password</label>
+        <div class="relative">
+          <input
+            id="password"
+            formControlName="password"
+            [type]="showPasswordSignal() ? 'text' : 'password'"
+            placeholder="At least 8 characters"
+            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 transition"
+            [class.border-red-500]="form.get('password')?.touched && form.get('password')?.invalid"
+          />
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600"
+          >
+            @if (showPasswordSignal()) {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-4.803m5.596-3.856a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
+              </svg>
+            } @else {
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            }
+          </button>
+        </div>
+        @if (form.get('password')?.touched && passwordError) {
+          <p class="text-red-500 text-xs mt-1">{{ passwordError }}</p>
+        }
+        <!-- Password Requirements -->
+        @if (form.get('password')?.value) {
+          <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+            <p class="text-xs font-semibold text-gray-700 mb-2">Password requirements:</p>
+            <ul class="text-xs text-gray-600 space-y-1">
+              <li [class.text-green-600]="(form.get('password')?.value?.length || 0) >= 8">
+                ✓ At least 8 characters
+              </li>
+              <li [class.text-green-600]="hasUpperCase()">
+                ✓ One uppercase letter
+              </li>
+              <li [class.text-green-600]="hasNumber()">
+                ✓ One number
+              </li>
+            </ul>
+          </div>
+        }
+      </div>
 
-    <button class="submit-btn" type="submit" [disabled]="form.invalid || loading">
-      {{ loading ? 'Creating account...' : 'Create account' }}
-    </button>
+      <!-- Confirm Password Field -->
+      <div>
+        <label for="confirmPassword" class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
+        <input
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          [type]="showPasswordSignal() ? 'text' : 'password'"
+          placeholder="••••••••"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 transition"
+          [class.border-red-500]="form.get('confirmPassword')?.touched && confirmPasswordError"
+        />
+        @if (form.get('confirmPassword')?.touched && confirmPasswordError) {
+          <p class="text-red-500 text-xs mt-1">{{ confirmPasswordError }}</p>
+        }
+      </div>
 
-    <p class="alt">
+      <!-- Terms & Conditions -->
+      <div class="flex items-start gap-2">
+        <input
+          id="agreeToTerms"
+          type="checkbox"
+          formControlName="agreeToTerms"
+          class="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500 cursor-pointer mt-0.5"
+        />
+        <label for="agreeToTerms" class="text-sm text-gray-600 cursor-pointer">
+          I agree to FoodyWeb's
+          <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold">Terms of Service</a>
+          and
+          <a href="#" class="text-primary-600 hover:text-primary-700 font-semibold">Privacy Policy</a>
+        </label>
+      </div>
+      @if (form.get('agreeToTerms')?.touched && form.get('agreeToTerms')?.invalid) {
+        <p class="text-red-500 text-xs">You must agree to continue</p>
+      }
+
+      <!-- Create Account Button -->
+      <button
+        type="submit"
+        [disabled]="form.invalid || loadingSignal()"
+        class="w-full btn btn-primary mt-6"
+      >
+        @if (loadingSignal()) {
+          <span class="inline-block animate-spin mr-2">⟳</span>
+          Creating account...
+        } @else {
+          Create Account
+        }
+      </button>
+    </form>
+
+    <!-- Sign In Link -->
+    <p class="text-center text-gray-600 mt-8">
       Already have an account?
-      <a routerLink="/login">Sign in</a>
+      <a routerLink="/login" class="text-primary-600 font-semibold hover:text-primary-700 transition">
+        Sign in
+      </a>
     </p>
-  </form>
+  </div>
 </div>

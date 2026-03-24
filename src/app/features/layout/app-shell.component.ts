@@ -17,7 +17,11 @@ export class AppShellComponent {
   private readonly notification = inject(NotificationService);
 
   readonly user = this.authSession.user;
-  readonly toast = this.notification.message;
+  readonly toastMessages = this.notification.messages;
+  readonly currentToast = computed(() => {
+    const messages = this.toastMessages();
+    return messages.length > 0 ? messages[messages.length - 1] : null;
+  });
 
   readonly firstName = computed(() => this.user()?.firstName ?? 'Guest');
 
