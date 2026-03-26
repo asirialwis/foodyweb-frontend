@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   // Use centralized gateway for production
-  // api: { gateway: 'http://54.179.184.235:8000' },
+  // api: { gateway: 'http://xx.xxx.xxx.xxx:8000' },
   
   // Use individual service URLs for development
   api: {
@@ -12,5 +12,5 @@ export const environment = {
   },
   
   // Gateway configuration (when services run behind API Gateway)
-  gateway: 'http://54.179.184.235:8000',
+  gateway: 'http://xx.xxx.xxx.xxx:8000',
 };

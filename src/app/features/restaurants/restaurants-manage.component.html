@@ -8,7 +8,7 @@
       </div>
       <button 
         (click)="showRestaurantFormSignal.set(true)"
-        class="btn btn-primary"
+        class="px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
       >
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -21,19 +21,19 @@
   <main class="max-w-7xl mx-auto px-4 py-8">
     <!-- Stats -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-      <div class="card">
+      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
         <p class="text-gray-600 text-sm">Total Restaurants</p>
         <p class="text-3xl font-bold text-gray-900">{{ stats().totalRestaurants }}</p>
       </div>
-      <div class="card">
+      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
         <p class="text-gray-600 text-sm">Menu Items</p>
         <p class="text-3xl font-bold text-gray-900">{{ stats().totalMenuItems }}</p>
       </div>
-      <div class="card">
+      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
         <p class="text-gray-600 text-sm">Open Restaurants</p>
         <p class="text-3xl font-bold text-gray-900">{{ stats().openRestaurants }}</p>
       </div>
-      <div class="card">
+      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
         <p class="text-gray-600 text-sm">Avg Rating</p>
         <p class="text-3xl font-bold text-gray-900">{{ stats().avgRating }} ⭐</p>
       </div>
@@ -74,7 +74,7 @@
               </div>
               <button 
                 (click)="selectRestaurant(restaurant); $event.stopPropagation()"
-                class="w-full btn btn-primary btn-sm"
+                class="w-full px-3 py-1 text-sm bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
               >
                 Manage →
               </button>
@@ -87,7 +87,7 @@
       <div>
         <button 
           (click)="selectedRestaurantSignal.set(null)"
-          class="mb-6 btn btn-ghost"
+          class="mb-6 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
         >
           ← Back to Restaurants
         </button>
@@ -107,7 +107,7 @@
 
         <!-- Overview Tab -->
         @if (activeTabSignal() === 'overview') {
-          <div class="card">
+          <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <div class="flex items-start justify-between mb-6">
               <div>
                 <h2 class="text-2xl font-bold text-gray-900">{{ selectedRestaurantSignal()?.name }}</h2>
@@ -115,7 +115,7 @@
               </div>
               <button 
                 (click)="showRestaurantFormSignal.set(true)"
-                class="btn btn-sm btn-outline"
+                class="px-3 py-1 text-sm border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Edit Restaurant
               </button>
@@ -156,7 +156,7 @@
           <div>
             <button 
               (click)="showMenuFormSignal.set(true); editingMenuItemSignal.set(null)"
-              class="mb-6 btn btn-primary"
+              class="mb-6 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors"
             >
               + Add Menu Item
             </button>
@@ -168,7 +168,7 @@
             } @else {
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @for (item of menuItemsSignal(); track item._id) {
-                  <div class="card">
+                  <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
                     <div class="flex items-start justify-between mb-3">
                       <h4 class="font-bold text-gray-900">{{ item.name }}</h4>
                       <span class="text-lg font-bold text-primary-600">₹{{ item.price }}</span>
@@ -177,13 +177,13 @@
                     <div class="flex gap-2">
                       <button 
                         (click)="editMenuItem(item)"
-                        class="flex-1 btn btn-sm btn-outline"
+                        class="flex-1 px-3 py-1 text-sm border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         Edit
                       </button>
                       <button 
                         (click)="deleteMenuItem((item._id ?? item.id)!)"
-                        class="flex-1 btn btn-sm btn-danger"
+                        class="flex-1 px-3 py-1 text-sm bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors"
                       >
                         Delete
                       </button>
@@ -225,7 +225,7 @@
                         type="button"
                         (click)="toggleCuisine(cuisine)"
                         [ngClass]="restaurantForm.get('cuisines')?.value?.includes(cuisine) ? 'btn-primary' : 'btn-outline'"
-                        class="btn btn-sm"
+                        class="px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
                       >
                         {{ cuisine }}
                       </button>
@@ -234,8 +234,8 @@
                 </div>
 
                 <div class="flex gap-3">
-                  <button type="submit" [disabled]="restaurantForm.invalid || savingSignal()" class="flex-1 btn btn-primary">Save</button>
-                  <button type="button" (click)="showRestaurantFormSignal.set(false)" class="flex-1 btn btn-outline">Cancel</button>
+                  <button type="submit" [disabled]="restaurantForm.invalid || savingSignal()" class="flex-1 px-4 py-3 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors">Save</button>
+                  <button type="button" (click)="showRestaurantFormSignal.set(false)" class="flex-1 px-4 py-3 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors">Cancel</button>
                 </div>
               </form>
             </div>
@@ -271,8 +271,8 @@
                 </div>
 
                 <div class="flex gap-3">
-                  <button type="submit" [disabled]="menuItemForm.invalid || savingSignal()" class="flex-1 btn btn-primary">Save</button>
-                  <button type="button" (click)="showMenuFormSignal.set(false)" class="flex-1 btn btn-outline">Cancel</button>
+                  <button type="submit" [disabled]="menuItemForm.invalid || savingSignal()" class="flex-1 px-4 py-3 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors">Save</button>
+                  <button type="button" (click)="showMenuFormSignal.set(false)" class="flex-1 px-4 py-3 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors">Cancel</button>
                 </div>
               </form>
             </div>

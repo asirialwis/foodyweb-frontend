@@ -1,11 +1,11 @@
-<section class="heading">
+<section class="space-y-2 mb-8 py-4">
   <h1>User administration</h1>
   <p>Manage account roles and basic profile details.</p>
 </section>
 
-<section class="list">
+<section class="space-y-4">
   @for (user of users(); track user.id ?? user.email) {
-    <article>
+    <article class="bg-white rounded-lg border border-gray-200 p-6 mb-4">
       <header>
         <strong>{{ user.firstName }} {{ user.lastName }}</strong>
         <span>{{ user.role }}</span>
@@ -25,7 +25,7 @@
         </select>
 
         <button type="submit">Save</button>
-        <button type="button" class="danger" (click)="remove(user)">Delete</button>
+        <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded" (click)="remove(user)">Delete</button>
       </form>
     </article>
   }

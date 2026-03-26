@@ -43,7 +43,7 @@
 
             <button 
               (click)="logout()"
-              class="w-full btn btn-danger mt-6"
+              class="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors mt-6"
             >
               <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -56,7 +56,7 @@
         <!-- Main Content: Profile, Addresses, Password -->
         <div class="lg:col-span-2 space-y-8">
           <!-- Profile Section -->
-          <div class="card">
+          <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
               <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -110,7 +110,7 @@
               <button
                 type="submit"
                 [disabled]="profileForm.invalid || savingSignal()"
-                class="w-full btn btn-primary"
+                class="w-full px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
               >
                 @if (savingSignal()) {
                   <span class="inline-block animate-spin mr-2">⟳</span>
@@ -123,7 +123,7 @@
           </div>
 
           <!-- Addresses Section -->
-          <div class="card">
+          <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@
               @if (!showAddressFormSignal()) {
                 <button 
                   (click)="showAddressFormSignal.set(true)"
-                  class="btn btn-sm btn-primary"
+                  class="px-3 py-1.5 text-sm bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
                 >
                   + Add Address
                 </button>
@@ -227,14 +227,14 @@
                     type="button"
                     (click)="editingAddressIndexSignal() !== null ? updateAddress(editingAddressIndexSignal()!) : addAddress()"
                     [disabled]="addressForm.invalid || savingSignal()"
-                    class="flex-1 btn btn-primary"
+                    class="flex-1 px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
                   >
                     {{ editingAddressIndexSignal() !== null ? 'Update Address' : 'Add Address' }}
                   </button>
                   <button
                     type="button"
                     (click)="cancelAddressForm()"
-                    class="flex-1 btn btn-outline"
+                    class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>
@@ -265,13 +265,13 @@
                       <div class="flex gap-2">
                         <button 
                           (click)="editAddress($index)"
-                          class="btn btn-sm btn-outline"
+                          class="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           Edit
                         </button>
                         <button 
                           (click)="deleteAddress($index)"
-                          class="btn btn-sm btn-danger"
+                          class="px-3 py-1.5 text-sm bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
                         >
                           Delete
                         </button>
@@ -286,7 +286,7 @@
           </div>
 
           <!-- Password Section -->
-          <div class="card">
+          <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
             <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center justify-between gap-2">
               <div class="flex items-center gap-2">
                 <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,7 +297,7 @@
               @if (!showPasswordFormSignal()) {
                 <button 
                   (click)="showPasswordFormSignal.set(true)"
-                  class="btn btn-sm btn-outline"
+                  class="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Change
                 </button>
@@ -341,14 +341,14 @@
                   <button
                     type="submit"
                     [disabled]="passwordForm.invalid || savingSignal()"
-                    class="flex-1 btn btn-primary"
+                    class="flex-1 px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
                   >
                     Update Password
                   </button>
                   <button
                     type="button"
                     (click)="showPasswordFormSignal.set(false)"
-                    class="flex-1 btn btn-outline"
+                    class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     Cancel
                   </button>

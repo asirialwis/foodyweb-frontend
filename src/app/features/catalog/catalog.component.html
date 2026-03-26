@@ -52,8 +52,8 @@
             <button 
               *ngFor="let cuisine of cuisines"
               (click)="onCuisineChange(selectedCuisineSignal() === cuisine ? '' : cuisine)"
-              [ngClass]="selectedCuisineSignal() === cuisine ? 'btn-primary' : 'btn-outline'"
-              class="btn btn-sm"
+              [ngClass]="selectedCuisineSignal() === cuisine ? 'bg-primary-500 text-white' : 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50'"
+              class="px-4 py-2 rounded-lg font-medium text-sm transition-colors"
             >
               {{ cuisine }}
             </button>
@@ -125,13 +125,13 @@
             <div class="flex items-baseline gap-4 mb-4">
               <button 
                 (click)="selectedRestaurant.set(null)"
-                class="btn btn-ghost btn-sm"
+                class="px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 ← Back to Restaurants
               </button>
             </div>
 
-            <div class="card">
+            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <div class="flex gap-6">
                 <div class="w-32 h-32 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
                   @if (selectedRestaurant()?.imageUrl) {
@@ -182,16 +182,16 @@
             <div class="mb-8 flex gap-2 overflow-x-auto pb-2">
               <button 
                 (click)="selectCategory('')"
-                [ngClass]="selectedCategorySignal() === '' ? 'btn-primary' : 'btn-outline'"
-                class="btn btn-sm flex-shrink-0"
+                [ngClass]="selectedCategorySignal() === '' ? 'bg-primary-500 text-white' : 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50'"
+                class="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex-shrink-0"
               >
                 All
               </button>
               @for (category of categories(); track category) {
                 <button 
                   (click)="selectCategory(category)"
-                  [ngClass]="selectedCategorySignal() === category ? 'btn-primary' : 'btn-outline'"
-                  class="btn btn-sm flex-shrink-0"
+                  [ngClass]="selectedCategorySignal() === category ? 'bg-primary-500 text-white' : 'bg-white text-gray-900 border border-gray-300 hover:bg-gray-50'"
+                  class="px-4 py-2 rounded-lg font-medium text-sm transition-colors flex-shrink-0"
                 >
                   {{ category }}
                 </button>
@@ -219,7 +219,7 @@
 
         <div class="lg:col-span-1">
           <div class="sticky top-20">
-            <div class="card">
+            <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
               <h3 class="text-lg font-bold text-gray-900 mb-4">Your Order</h3>
               
               @if ((cartItems() || []).length > 0) {
@@ -281,13 +281,13 @@
                 <div class="mt-4 space-y-2">
                   <button 
                     (click)="openCheckout()"
-                    class="btn btn-primary w-full"
+                    class="w-full px-4 py-3 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 transition-colors"
                   >
                     Proceed to Checkout
                   </button>
                   <button 
                     (click)="clearCart()"
-                    class="btn btn-outline w-full"
+                    class="w-full px-4 py-3 border border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     Clear Cart
                   </button>
@@ -426,7 +426,7 @@
             <button 
               (click)="checkout()"
               [disabled]="!canCheckout() || placingOrder"
-              class="btn btn-primary w-full"
+              class="w-full px-4 py-3 bg-primary-500 text-white font-semibold rounded-lg hover:bg-primary-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
             >
               @if (placingOrder) {
                 Placing Order...
@@ -437,7 +437,7 @@
             <button 
               type="button"
               (click)="closeCheckout()"
-              class="btn btn-outline w-full"
+              class="w-full px-4 py-3 border border-gray-300 text-gray-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>

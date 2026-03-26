@@ -1,26 +1,48 @@
-<div class="shell">
-  <header class="topbar">
-    <div class="brand" routerLink="/dashboard">FoodyWeb</div>
+<div class="min-h-screen flex flex-col">
+  <header class="sticky top-0 z-20 flex items-center justify-between gap-4 px-6 py-3 bg-gray-900 text-white shadow-lg">
+    <div class="text-2xl font-bold cursor-pointer hover:text-primary-400 transition-colors" routerLink="/dashboard">FoodyWeb</div>
 
-    <nav class="main-nav">
+    <nav class="flex items-center gap-x-2">
       @for (item of navItems(); track item.link) {
-        <a [routerLink]="item.link" routerLinkActive="active">{{ item.label }}</a>
+        <a 
+          [routerLink]="item.link" 
+          routerLinkActive
+          #rla="routerLinkActive"
+          [routerLinkActiveOptions]="{ exact: true }"
+          [class.bg-primary-600]="rla.isActive"
+          [class.text-white]="rla.isActive"
+          [class.text-gray-300]="!rla.isActive"
+          [class.hover:bg-gray-800]="!rla.isActive"
+          [class.hover:text-white]="!rla.isActive"
+          class="px-4 py-2 rounded-lg transition-all"
+        >
+          {{ item.label }}
+        </a>
       }
     </nav>
 
-    <div class="account-actions">
-      <span class="welcome">Hi, {{ firstName() }}</span>
-      <button type="button" (click)="logout()">Logout</button>
+    <div class="flex items-center gap-4">
+      <span class="text-sm text-gray-300">Hi, <span class="font-semibold">{{ firstName() }}</span></span>
+      <button 
+        type="button" 
+        (click)="logout()"
+        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm"
+      >
+        Logout
+      </button>
     </div>
   </header>
 
   @if (currentToast()) {
-    <div class="toast" [class.error]="currentToast()?.type === 'error'">
+    <div 
+      [ngClass]="currentToast()?.type === 'error' ? 'bg-red-50 border-red-300 text-red-900' : 'bg-green-50 border-green-300 text-green-900'"
+      class="mx-4 my-3 px-4 py-3 rounded-lg border text-sm font-medium shadow-sm"
+    >
       {{ currentToast()?.text }}
     </div>
   }
 
-  <main class="content">
+  <main class="flex-1 p-4 md:p-6">
     <router-outlet />
   </main>
 </div>

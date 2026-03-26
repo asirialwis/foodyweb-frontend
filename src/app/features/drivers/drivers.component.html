@@ -1,10 +1,10 @@
-<section class="heading">
+<section class="space-y-2 mb-8 py-4">
   <h1>Driver profile</h1>
   <p>Register once, then switch online/offline based on your shift.</p>
 </section>
 
 @if (!myDriver()) {
-  <form class="create-form" [formGroup]="form" (ngSubmit)="register()">
+  <form class="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg" [formGroup]="form" (ngSubmit)="register()">
     <input formControlName="vehicleNumber" placeholder="Vehicle number" />
     <input formControlName="licenseNumber" placeholder="License number" />
     <select formControlName="vehicleType">
@@ -17,25 +17,25 @@
 }
 
 @if (myDriver()) {
-  <section class="card">
+  <section class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
     <h3>{{ myDriver()?.vehicleType | titlecase }}</h3>
     <p>Vehicle: {{ myDriver()?.vehicleNumber || 'N/A' }}</p>
     <p>Status: {{ myDriver()?.isAvailable ? 'Online' : 'Offline' }}</p>
 
-    <div class="actions">
+    <div class="flex gap-3 mt-4">
       <button type="button" (click)="toggleMyAvailability()">
         {{ myDriver()?.isAvailable ? 'Go offline' : 'Go online' }}
       </button>
-      <button type="button" class="danger" (click)="deleteMyDriver()">Delete profile</button>
+      <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded" (click)="deleteMyDriver()">Delete profile</button>
     </div>
   </section>
 }
 
 @if (isAdmin()) {
-  <section class="admin-list">
+  <section class="space-y-4">
     <h2>All drivers</h2>
     @for (driver of drivers(); track driver._id ?? driver.id ?? driver.userId) {
-      <article>
+      <article class="bg-white rounded-lg border border-gray-200 p-4">
         <strong>{{ driver.userId }}</strong>
         <span>{{ driver.vehicleType }}</span>
         <span>{{ driver.isAvailable ? 'online' : 'offline' }}</span>

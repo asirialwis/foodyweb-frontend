@@ -1,4 +1,4 @@
-<section class="heading">
+<section class="space-y-2 mb-8 py-4">
   <h1>{{ isDriver() ? 'My deliveries' : 'Delivery operations' }}</h1>
   <p>
     @if (isDriver()) {
@@ -9,7 +9,7 @@
   </p>
 </section>
 
-<div class="toolbar">
+<div class="flex gap-4 items-center mb-6 p-4 bg-gray-50 rounded-lg">
   <label>
     Status
     <select [(ngModel)]="statusFilter" (change)="load()">
@@ -25,16 +25,16 @@
   <button type="button" (click)="load()">Refresh</button>
 </div>
 
-<section class="list">
+<section class="space-y-4">
   @if (!deliveries().length) {
-    <p class="empty">No deliveries available.</p>
+    <p class="text-gray-500 italic py-6 text-center">No deliveries available.</p>
   }
 
   @for (delivery of deliveries(); track delivery._id ?? delivery.id ?? delivery.orderId) {
-    <article>
+    <article class="bg-white rounded-lg border border-gray-200 p-6 mb-4">
       <header>
         <strong>#{{ delivery._id ?? delivery.id }}</strong>
-        <span class="chip">{{ delivery.status }}</span>
+        <span class="inline-block bg-blue-100 text-blue-900 px-3 py-1 rounded-full text-sm font-medium">{{ delivery.status }}</span>
       </header>
 
       <p>Order: {{ delivery.orderId }}</p>
