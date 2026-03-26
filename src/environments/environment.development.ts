@@ -1,11 +1,9 @@
-/// <reference types="vite/client" />
-
 export const environment = {
   production: false,
   api: {
-    user: import.meta.env['VITE_DEV_USER_API'],
-    restaurant: import.meta.env['VITE_DEV_RESTAURANT_API'],
-    order: import.meta.env['VITE_DEV_ORDER_API'],
-    delivery: import.meta.env['VITE_DEV_DELIVERY_API'],
+    user: 'http://localhost:3001',
+    restaurant: 'http://localhost:3002',
+    order: 'http://localhost:3003',
+    delivery: 'http://localhost:3004',
   },
 };
