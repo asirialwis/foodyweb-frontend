@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthApiService } from '../../core/api/auth-api.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { UserType } from '../../core/models/types';
 
 @Component({
   selector: 'app-register',
@@ -22,7 +23,8 @@ export class RegisterComponent {
 
   readonly loadingSignal = signal(false);
   readonly showPasswordSignal = signal(false);
-  readonly userTypeSignal = signal<'customer' | 'restaurant' | 'driver'>('customer');
+  readonly userTypeSignal = signal<UserType>(UserType.CUSTOMER);
+  readonly UserType = UserType; // For template access
 
   readonly form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.minLength(2)]],
@@ -89,7 +91,7 @@ export class RegisterComponent {
     this.showPasswordSignal.update((v) => !v);
   }
 
-  setUserType(type: 'customer' | 'restaurant' | 'driver'): void {
+  setUserType(type: UserType): void {
     this.userTypeSignal.set(type);
   }
 

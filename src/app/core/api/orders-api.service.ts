@@ -98,7 +98,7 @@ export class OrdersApiService {
     if (filters?.limit) {
       params = params.set('limit', String(filters.limit));
     }
-    return this.http.get<Order[] | { orders: Order[]; total: number }>(`${API_ENDPOINTS.orders}/my-orders`, { params }).pipe(
+    return this.http.get<Order[] | { orders: Order[]; total: number }>(`${API_ENDPOINTS.orders}`, { params }).pipe(
       map((r) => (Array.isArray(r) ? r : (r as { orders: Order[] }).orders ?? []))
     );
   }

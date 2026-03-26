@@ -133,10 +133,10 @@
             <!-- Delivery Details -->
             <div class="space-y-2 mb-4">
               <p class="font-medium text-gray-900">
-                From: <span class="text-gray-700 font-normal">{{ delivery.pickupAddress?.street || 'Restaurant' }}</span>
+                From: <span class="text-gray-700 font-normal">{{ delivery.pickupAddress.street || 'Restaurant' }}</span>
               </p>
               <p class="font-medium text-gray-900">
-                To: <span class="text-gray-700 font-normal">{{ delivery.deliveryAddress?.street || 'Address' }}</span>
+                To: <span class="text-gray-700 font-normal">{{ delivery.deliveryAddress.street || 'Address' }}</span>
               </p>
               <p class="text-sm text-gray-600">
                 <span class="font-medium">Fee:</span> ${{ delivery.deliveryFee?.toFixed(2) }}
@@ -149,7 +149,7 @@
 
             <!-- Customer Info -->
             <div class="bg-gray-50 rounded p-3 mb-4">
-              <p class="text-sm font-medium text-gray-900">Order ID: {{ delivery.orderId?.slice(-6) || 'N/A' }}</p>
+              <p class="text-sm font-medium text-gray-900">Order ID: {{ delivery.orderId.slice(-6) || 'N/A' }}</p>
               <p class="text-sm text-gray-600">Status: {{ delivery.status | titlecase }}</p>
             </div>
           </div>

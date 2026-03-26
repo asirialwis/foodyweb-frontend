@@ -15,25 +15,25 @@
     <div class="mb-6 flex gap-2">
       <button
         type="button"
-        (click)="setUserType('customer')"
-        [ngClass]="userTypeSignal() === 'customer' ? 'btn-primary' : 'btn-outline'"
-        class="flex-1 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+        (click)="setUserType(UserType.CUSTOMER)"
+        [ngClass]="userTypeSignal() === UserType.CUSTOMER ? 'btn-primary' : 'btn-outline'"
+        class="flex-1 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-150 transition-colors"
       >
         👤 Customer
       </button>
       <button
         type="button"
-        (click)="setUserType('restaurant')"
-        [ngClass]="userTypeSignal() === 'restaurant' ? 'btn-primary' : 'btn-outline'"
-        class="flex-1 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+        (click)="setUserType(UserType.RESTAURANT)"
+        [ngClass]="userTypeSignal() === UserType.RESTAURANT ? 'btn-primary' : 'btn-outline'"
+        class="flex-1 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-150 transition-colors"
       >
         🏪 Restaurant
       </button>
       <button
         type="button"
-        (click)="setUserType('driver')"
-        [ngClass]="userTypeSignal() === 'driver' ? 'btn-primary' : 'btn-outline'"
-        class="flex-1 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+        (click)="setUserType(UserType.DRIVER)"
+        [ngClass]="userTypeSignal() === UserType.DRIVER ? 'btn-primary' : 'btn-outline'"
+        class="flex-1 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-150 transition-colors"
       >
         🚗 Driver
       </button>

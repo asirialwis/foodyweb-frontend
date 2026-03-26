@@ -1,3 +1,9 @@
+export enum UserType {
+  CUSTOMER = 'customer',
+  RESTAURANT = 'restaurant_owner',
+  DRIVER = 'delivery_driver',
+}
+
 export type UserRole =
   | 'customer'
   | 'restaurant_owner'
