@@ -102,7 +102,9 @@ export class RegisterComponent {
 
     this.loadingSignal.set(true);
     const { confirmPassword, agreeToTerms, ...payload } = this.form.getRawValue();
-    this.authApi.register(payload).subscribe({
+    const fullPayload = { ...payload, role: this.userTypeSignal() };
+
+    this.authApi.register(fullPayload).subscribe({
       next: (response) => {
         this.authSession.setSession(response.access_token, response.user);
         this.notification.success('Account created', 'Welcome to FoodyWeb!');
