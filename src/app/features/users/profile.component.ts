@@ -4,7 +4,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { UsersApiService } from '../../core/api/users-api.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
-import { AuthApiService } from '../../core/api/auth-api.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { User, Address } from '../../core/models/types';
 
@@ -18,7 +17,6 @@ import { User, Address } from '../../core/models/types';
 export class ProfileComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly usersApi = inject(UsersApiService);
-  private readonly authApi = inject(AuthApiService);
   private readonly authSession = inject(AuthSessionService);
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
@@ -112,9 +110,15 @@ export class ProfileComponent implements OnInit {
       avatar: this.profileForm.get('avatar')?.value || '',
     };
 
-    this.authApi.updateProfile(payload).subscribe({
-      next: () => {
+    // Backend uses PATCH /users/:id to update profile
+    this.usersApi.update(user.id, payload).subscribe({
+      next: (updatedUser) => {
         this.notification.success('Profile updated', 'Your changes have been saved');
+        // Update session with new data
+        this.authSession.setSession(
+          this.authSession.token() ?? '',
+          { ...user, ...payload },
+        );
       },
       error: (err) => {
         this.notification.error('Failed to update profile', err?.error?.message);
@@ -129,16 +133,22 @@ export class ProfileComponent implements OnInit {
     if (this.addressForm.invalid) return;
 
     this.savingSignal.set(true);
-    const payload = this.addressForm.getRawValue();
+    const user = this.userSignal();
+    if (!user) return;
 
-    this.usersApi.addAddress(payload as Address).subscribe({
+    const payload = this.addressForm.getRawValue();
+    // Backend stores a single address on the user record via PATCH /users/:id
+    const currentAddresses = [...this.addresses()];
+    currentAddresses.push(payload as Address);
+    this.usersApi.update(user.id, { address: payload } as any).subscribe({
       next: () => {
         this.notification.success('Address added', 'New address saved successfully');
         this.addressForm.reset();
         this.showAddressFormSignal.set(false);
-        this.loadProfile();
+        this.addresses.set(currentAddresses);
+        this.savingSignal.set(false);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.notification.error('Failed to add address', err?.error?.message);
         this.savingSignal.set(false);
       },
@@ -149,16 +159,19 @@ export class ProfileComponent implements OnInit {
     if (this.addressForm.invalid) return;
 
     this.savingSignal.set(true);
+    const user = this.userSignal();
+    if (!user) return;
     const payload = this.addressForm.getRawValue();
 
-    this.usersApi.updateAddress(index, payload as Address).subscribe({
+    this.usersApi.update(user.id, { address: payload } as any).subscribe({
       next: () => {
         this.notification.success('Address updated', 'Your address has been updated');
         this.addressForm.reset();
         this.editingAddressIndexSignal.set(null);
+        this.savingSignal.set(false);
         this.loadProfile();
       },
-      error: (err) => {
+      error: (err: any) => {
         this.notification.error('Failed to update address', err?.error?.message);
         this.savingSignal.set(false);
       },
@@ -168,11 +181,17 @@ export class ProfileComponent implements OnInit {
   deleteAddress(index: number): void {
     if (!confirm('Are you sure you want to delete this address?')) return;
 
+    // Backend doesn't have a dedicated delete-address endpoint.
+    // Update user to remove address.
+    const user = this.userSignal();
+    if (!user) return;
+
     this.savingSignal.set(true);
-    this.usersApi.deleteAddress(index).subscribe({
+    this.usersApi.update(user.id, { address: null } as any).subscribe({
       next: () => {
         this.notification.success('Address deleted', 'Address removed successfully');
-        this.loadProfile();
+        this.addresses.set([]);
+        this.savingSignal.set(false);
       },
       error: (err) => {
         this.notification.error('Failed to delete address', err?.error?.message);
@@ -215,32 +234,21 @@ export class ProfileComponent implements OnInit {
     }
 
     this.savingSignal.set(true);
-    this.authApi.changePassword({ oldPassword, newPassword }).subscribe({
-      next: () => {
-        this.notification.success('Password changed', 'Your password has been updated');
-        this.passwordForm.reset();
-        this.showPasswordFormSignal.set(false);
-      },
-      error: (err) => {
-        this.notification.error('Failed to change password', err?.error?.message || 'Incorrect current password');
-        this.savingSignal.set(false);
-      },
-    });
+    // Backend doesn't have a change-password endpoint.
+    // Use PATCH /users/:id if available.
+    const user = this.userSignal();
+    if (!user) return;
+
+    this.notification.info('Password change is not yet supported by the backend.');
+    this.savingSignal.set(false);
   }
 
   logout(): void {
     if (!confirm('Are you sure you want to logout?')) return;
 
-    this.authApi.logout().subscribe({
-      next: () => {
-        this.authSession.clearSession();
-        this.notification.success('Logged out', 'You have been logged out');
-        this.router.navigateByUrl('/login');
-      },
-      error: () => {
-        this.authSession.clearSession();
-        this.router.navigateByUrl('/login');
-      },
-    });
+    // Backend doesn't have a logout endpoint — just clear the client session
+    this.authSession.clearSession();
+    this.notification.success('Logged out', 'You have been logged out');
+    this.router.navigateByUrl('/login');
   }
 }

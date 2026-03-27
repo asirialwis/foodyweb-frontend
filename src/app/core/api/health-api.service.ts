@@ -1,40 +1,48 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { forkJoin, Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
 import { API_ENDPOINTS } from '../config/api-endpoints';
-import { HealthStatus } from '../models/types';
+
+export interface HealthStatus {
+  status: string;
+  service: string;
+  timestamp: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class HealthApiService {
   constructor(private readonly http: HttpClient) {}
 
-  user(): Observable<HealthStatus> {
-    return this.http.get<HealthStatus>(API_ENDPOINTS.healthUser);
+  /** GET /health on user-service */
+  checkUserService(): Observable<HealthStatus | null> {
+    return this.http.get<HealthStatus>(API_ENDPOINTS.healthUser).pipe(
+      timeout(5000),
+      catchError(() => of(null)),
+    );
   }
 
-  restaurant(): Observable<HealthStatus> {
-    return this.http.get<HealthStatus>(API_ENDPOINTS.healthRestaurant);
+  /** GET /health on restaurant-service */
+  checkRestaurantService(): Observable<HealthStatus | null> {
+    return this.http.get<HealthStatus>(API_ENDPOINTS.healthRestaurant).pipe(
+      timeout(5000),
+      catchError(() => of(null)),
+    );
   }
 
-  order(): Observable<HealthStatus> {
-    return this.http.get<HealthStatus>(API_ENDPOINTS.healthOrder);
+  /** GET /health on order-service */
+  checkOrderService(): Observable<HealthStatus | null> {
+    return this.http.get<HealthStatus>(API_ENDPOINTS.healthOrder).pipe(
+      timeout(5000),
+      catchError(() => of(null)),
+    );
   }
 
-  delivery(): Observable<HealthStatus> {
-    return this.http.get<HealthStatus>(API_ENDPOINTS.healthDelivery);
-  }
-
-  all(): Observable<{
-    user: HealthStatus;
-    restaurant: HealthStatus;
-    order: HealthStatus;
-    delivery: HealthStatus;
-  }> {
-    return forkJoin({
-      user: this.user(),
-      restaurant: this.restaurant(),
-      order: this.order(),
-      delivery: this.delivery(),
-    });
+  /** GET /health on delivery-service */
+  checkDeliveryService(): Observable<HealthStatus | null> {
+    return this.http.get<HealthStatus>(API_ENDPOINTS.healthDelivery).pipe(
+      timeout(5000),
+      catchError(() => of(null)),
+    );
   }
 }

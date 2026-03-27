@@ -96,11 +96,9 @@ export class RestaurantsManageComponent implements OnInit {
     }
 
     this.restaurantsApi.findAll().subscribe({
-      next: (response) => {
-        // Handle both array and paginated responses
-        const restaurants = Array.isArray(response) ? response : response.restaurants;
+      next: (restaurants) => {
         // Filter to only show restaurants owned by current user
-        const ownedRestaurants = (restaurants as Restaurant[]).filter((r: Restaurant) => r.ownerId === userId);
+        const ownedRestaurants = restaurants.filter((r: Restaurant) => r.ownerId === userId);
         this.restaurantsSignal.set(ownedRestaurants);
       },
       error: (err: any) => {
@@ -155,6 +153,7 @@ export class RestaurantsManageComponent implements OnInit {
         next: () => {
           this.notification.success('Restaurant updated', 'Changes saved successfully');
           this.showRestaurantFormSignal.set(false);
+          this.savingSignal.set(false);
           this.loadRestaurants();
         },
         error: (err: any) => {
@@ -169,6 +168,7 @@ export class RestaurantsManageComponent implements OnInit {
           this.notification.success('Restaurant created', 'Your restaurant is now listed');
           this.restaurantForm.reset();
           this.showRestaurantFormSignal.set(false);
+          this.savingSignal.set(false);
           this.loadRestaurants();
         },
         error: (err: any) => {
@@ -201,6 +201,7 @@ export class RestaurantsManageComponent implements OnInit {
           this.notification.success('Menu item updated', 'Changes saved');
           this.showMenuFormSignal.set(false);
           this.editingMenuItemSignal.set(null);
+          this.savingSignal.set(false);
           this.loadMenuItems(restaurantId);
         },
         error: (err: any) => {
@@ -215,6 +216,7 @@ export class RestaurantsManageComponent implements OnInit {
           this.notification.success('Menu item added', 'New item added to menu');
           this.menuItemForm.reset();
           this.showMenuFormSignal.set(false);
+          this.savingSignal.set(false);
           this.loadMenuItems(restaurantId);
         },
         error: (err: any) => {

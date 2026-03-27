@@ -135,7 +135,26 @@ export class OrdersComponent implements OnInit {
 
   loadOrders(): void {
     this.loadingSignal.set(true);
-    this.ordersApi.getMyOrders().subscribe({
+    const role = this.role();
+    const userId = this.userId();
+
+    // Use role-appropriate API call
+    let orders$;
+    if (role === 'admin') {
+      // Admin sees all orders
+      orders$ = this.ordersApi.findAll();
+    } else if (role === 'restaurant_owner') {
+      // Restaurant owner: first get their restaurants, then get orders by restaurantId
+      // For now, use findAll which the backend filters via query params
+      orders$ = this.ordersApi.findAll();
+    } else {
+      // Customer: GET /orders/user/:userId
+      orders$ = userId
+        ? this.ordersApi.findByUserId(userId)
+        : this.ordersApi.findAll({ userId });
+    }
+
+    orders$.subscribe({
       next: (orders) => {
         this.ordersSignal.set(orders);
       },
@@ -205,14 +224,16 @@ export class OrdersComponent implements OnInit {
       return;
     }
 
-    this.ordersApi.rateOrder(orderId, { rating: stars, comment: '' } as any).subscribe({
-      next: () => {
-        this.notification.success('Thank you!', 'Your rating has been recorded');
-        this.loadOrders();
-      },
-      error: (err: any) => {
-        this.notification.error('Failed to rate order', err?.error?.message);
-      },
-    });
+    // Note: Backend doesn't have a dedicated rate endpoint yet
+    this.notification.info('Rating feature coming soon!');
+  }
+
+  formatDeliveryAddress(address: any): string {
+    if (!address) return 'Address unavailable';
+    if (typeof address === 'string') return address;
+    const { street, apartment, city, state, zipCode, country } = address;
+    return [street, apartment, city, state, zipCode, country]
+      .filter(Boolean)
+      .join(', ') || 'Address unavailable';
   }
 }

@@ -33,15 +33,6 @@
     </div>
   </header>
 
-  @if (currentToast()) {
-    <div 
-      [ngClass]="currentToast()?.type === 'error' ? 'bg-red-50 border-red-300 text-red-900' : 'bg-green-50 border-green-300 text-green-900'"
-      class="mx-4 my-3 px-4 py-3 rounded-lg border text-sm font-medium shadow-sm"
-    >
-      {{ currentToast()?.text }}
-    </div>
-  }
-
   <main class="flex-1 p-4 md:p-6">
     <router-outlet />
   </main>

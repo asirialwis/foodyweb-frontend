@@ -43,27 +43,25 @@ export class MenuManageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.restaurantsApi.findAll().subscribe((response) => {
-      const restaurants = Array.isArray(response) ? response : response.restaurants;
-      this.allRestaurants.set(restaurants as Restaurant[]);
+    this.restaurantsApi.findAll().subscribe((restaurants) => {
+      this.allRestaurants.set(restaurants);
       this.loadItems();
     });
   }
 
   loadItems(): void {
-    this.menuApi.findAll().subscribe((response) => {
-      const items = Array.isArray(response) ? response : response.items;
+    this.menuApi.findAll().subscribe((items) => {
       const allowedRestaurantIds = new Set(
         this.availableRestaurants().map((restaurant) => restaurant._id ?? restaurant.id).filter((id): id is string => !!id),
       );
 
       if (this.isAdmin()) {
-        this.items.set(items as MenuItem[]);
+        this.items.set(items);
         return;
       }
 
       this.items.set(
-        (items as MenuItem[]).filter((item) => allowedRestaurantIds.has(item.restaurantId)),
+        items.filter((item) => allowedRestaurantIds.has(item.restaurantId)),
       );
     });
   }

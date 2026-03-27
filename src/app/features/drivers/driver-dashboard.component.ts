@@ -108,26 +108,32 @@ export class DriverDashboardComponent implements OnInit {
   }
 
   loadDriverStats(): void {
-    this.driversApi.getDeliveryStats().subscribe({
-      next: (stats) => {
-        this.driverStatsSignal.set({
-          totalDeliveries: stats.totalDeliveries || 0,
-          completedToday: stats.completedToday || 0,
-          activeDeliveries: this.filteredDeliveries().length,
-          totalEarnings: stats.totalEarnings || 0,
-          rating: stats.rating || 4.5,
-        });
-      },
-      error: (err) => console.error('Error loading stats:', err),
+    // Backend doesn't have a stats endpoint - compute from loaded deliveries
+    const active = this.activeDeliveriesSignal();
+    const completed = this.completedDeliveriesSignal();
+    const today = new Date().toDateString();
+    this.driverStatsSignal.set({
+      totalDeliveries: active.length + completed.length,
+      completedToday: completed.filter(d => d.createdAt && new Date(d.createdAt).toDateString() === today).length,
+      activeDeliveries: active.length,
+      totalEarnings: completed.reduce((sum, d) => sum + (d.deliveryFee || 0), 0),
+      rating: 4.5,
     });
   }
 
   toggleAvailability(): void {
     this.savingSignal.set(true);
     const isAvailable = this.availabilityForm.get('isAvailable')?.value ?? false;
+    const driverId = this.authSession.user()?.id;
 
+    if (!driverId) {
+      this.savingSignal.set(false);
+      return;
+    }
+
+    // Backend uses PATCH /drivers/:id/availability
     this.driversApi
-      .toggleAvailability(isAvailable)
+      .updateAvailability(driverId, isAvailable)
       .subscribe({
         next: () => {
           this.notification.success(
@@ -248,29 +254,10 @@ export class DriverDashboardComponent implements OnInit {
   submitRating(delivery: DeliveryWithOrder): void {
     if (this.ratingForm.invalid) return;
 
-    const deliveryId = delivery.id || delivery._id;
-    if (!deliveryId) return;
-
-    this.savingSignal.set(true);
-    const { rating, comment } = this.ratingForm.value;
-
-    this.deliveriesApi
-      .rateDelivery(deliveryId, {
-        rating: rating || 5,
-      } as any)
-      .subscribe({
-        next: () => {
-          this.notification.success('Success', 'Rating submitted');
-          this.showRatingFormSignal.set(false);
-          this.ratingForm.reset({ rating: 5, comment: '' });
-          this.savingSignal.set(false);
-        },
-        error: (err) => {
-          console.error('Error submitting rating:', err);
-          this.notification.error('Error', 'Failed to submit rating');
-          this.savingSignal.set(false);
-        },
-      });
+    // Backend doesn't have a rating endpoint for deliveries yet
+    this.notification.info('Rating feature coming soon!');
+    this.showRatingFormSignal.set(false);
+    this.ratingForm.reset({ rating: 5, comment: '' });
   }
 
   cancelRating(): void {

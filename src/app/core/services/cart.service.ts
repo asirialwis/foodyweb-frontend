@@ -30,7 +30,7 @@ export class CartService {
   readonly discount = signal<number>(0);
 
   readonly total = computed(() => {
-    return this.subtotal() + this.tax() + this.deliveryFee() - this.discount();
+    return Math.round((this.subtotal() + this.tax() + this.deliveryFee() - this.discount()) * 100) / 100;
   });
 
   readonly isEmpty = computed(() => this.cartItemsSignal().length === 0);

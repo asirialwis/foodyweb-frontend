@@ -3,16 +3,16 @@ import { environment } from '../../../environments/environment';
 export const API_ENDPOINTS = {
   auth: `${environment.api.user}/auth`,
   users: `${environment.api.user}/users`,
-  healthUser: `${environment.api.user}/users/health`,
+  healthUser: `${environment.api.user}/health`,
 
   restaurants: `${environment.api.restaurant}/restaurants`,
   menuItems: `${environment.api.restaurant}/menu-items`,
-  healthRestaurant: `${environment.api.restaurant}/restaurants/health`,
+  healthRestaurant: `${environment.api.restaurant}/health`,
 
   orders: `${environment.api.order}/orders`,
-  healthOrder: `${environment.api.order}/orders/health`,
+  healthOrder: `${environment.api.order}/health`,
 
   deliveries: `${environment.api.delivery}/deliveries`,
   drivers: `${environment.api.delivery}/drivers`,
-  healthDelivery: `${environment.api.delivery}/deliveries/health`,
+  healthDelivery: `${environment.api.delivery}/health`,
 };

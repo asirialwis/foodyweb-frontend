@@ -6,6 +6,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { MenuItemsApiService } from '../../core/api/menu-items-api.service';
 import { OrdersApiService } from '../../core/api/orders-api.service';
+import { CreateOrderPayload } from '../../core/api/orders-api.service';
 import { RestaurantsApiService } from '../../core/api/restaurants-api.service';
 import { CartService } from '../../core/services/cart.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
@@ -71,6 +72,13 @@ export class CatalogComponent implements OnInit {
   readonly cartCount = this.cartService.count;
   readonly subtotal = computed(() => Number(this.cartService.subtotal().toFixed(2)));
   readonly tax = computed(() => Number(this.cartService.tax().toFixed(2)));
+  readonly deliveryFee = computed(() => this.cartService.deliveryFee());
+
+  /** Derive restaurantId from cart items (survives page refresh) */
+  readonly cartRestaurantId = computed(() => {
+    const items = this.cartItems();
+    return items.length > 0 ? items[0].restaurantId : null;
+  });
 
   readonly restaurantsLoading = this.restaurantsLoadingSignal.asReadonly();
   readonly menuItemsLoading = this.menuItemsLoadingSignal.asReadonly();
@@ -107,8 +115,12 @@ export class CatalogComponent implements OnInit {
   }
 
   loadTopRated(): void {
-    this.restaurantsApi.getTopRated().subscribe({
-      next: (restaurants) => this.topRatedSignal.set(restaurants),
+    this.restaurantsApi.findAll({ isActive: true }).subscribe({
+      next: (restaurants) => {
+        // Sort by rating descending and take top 4
+        const sorted = [...restaurants].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+        this.topRatedSignal.set(sorted.slice(0, 4));
+      },
       error: (err) => console.error('Failed to load top rated', err),
     });
   }
@@ -118,17 +130,25 @@ export class CatalogComponent implements OnInit {
     const query = this.searchQuerySignal().trim();
     const cuisine = this.selectedCuisineSignal();
 
-    const filters = {
-      ...(query && { search: query }),
-      ...(cuisine && { cuisine }),
+    const filters: { cuisine?: string; isActive: boolean } = {
       isActive: true,
-      sortBy: this.sortBySignal(),
     };
+    if (cuisine) filters.cuisine = cuisine;
 
     this.restaurantsApi.findAll(filters).subscribe({
-      next: (response) => {
-        const restaurants = Array.isArray(response) ? response : response.restaurants;
-        this.restaurants.set(restaurants);
+      next: (restaurants) => {
+        let result = restaurants;
+        // Client-side search filter (backend doesn't have search endpoint)
+        if (query) {
+          const q = query.toLowerCase();
+          result = result.filter(
+            (r) =>
+              r.name?.toLowerCase().includes(q) ||
+              r.description?.toLowerCase().includes(q) ||
+              r.cuisine?.some((c) => c.toLowerCase().includes(q)),
+          );
+        }
+        this.restaurants.set(result);
       },
       error: (err) => {
         console.error('Failed to load restaurants', err);
@@ -158,6 +178,8 @@ export class CatalogComponent implements OnInit {
     if (restaurantId) {
       this.loadRestaurantMenu(restaurantId);
       this.selectedCategorySignal.set('');
+      // Apply delivery fee from restaurant to cart
+      this.cartService.setDeliveryFee(restaurant.deliveryFee ?? 0);
     }
   }
 
@@ -217,12 +239,19 @@ export class CatalogComponent implements OnInit {
   }
 
   canCheckout(): boolean {
-    return this.cartItems().length > 0 && this.checkoutForm.valid;
+    return this.cartItems().length > 0
+      && this.checkoutForm.valid
+      && !!(this.cartRestaurantId() || this.selectedRestaurant());
   }
 
   openCheckout(): void {
     if (this.cartItems().length === 0) {
       this.notification.warning('Your cart is empty');
+      return;
+    }
+    if (!this.authSession.isAuthenticated()) {
+      this.notification.warning('Please log in to place an order');
+      this.router.navigate(['/login']);
       return;
     }
     this.showCheckoutModal.set(true);
@@ -238,7 +267,10 @@ export class CatalogComponent implements OnInit {
     }
 
     const userId = this.authSession.user()?.id;
-    const restaurantId = this.selectedRestaurant()?._id ?? this.selectedRestaurant()?.id;
+    // Derive restaurantId from cart items (resilient to page refresh)
+    const restaurantId = this.cartRestaurantId()
+      ?? this.selectedRestaurant()?._id
+      ?? this.selectedRestaurant()?.id;
 
     if (!userId || !restaurantId) {
       this.notification.error('Unable to place order. Please try again.');
@@ -247,36 +279,39 @@ export class CatalogComponent implements OnInit {
 
     const payload = this.checkoutForm.getRawValue();
 
+    const orderPayload: CreateOrderPayload = {
+      userId,
+      restaurantId,
+      items: this.cartItems().map((item) => ({
+        menuItemId: item.menuItemId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.discountPrice && item.discountPrice < item.price
+          ? item.discountPrice
+          : item.price,
+      })),
+      totalAmount: this.cartTotal(),
+      paymentMethod: payload.paymentMethod,
+      deliveryAddress: {
+        street: payload.street,
+        city: payload.city,
+        state: payload.state,
+        zipCode: payload.zipCode,
+        country: payload.country,
+      },
+      specialInstructions: payload.specialInstructions || undefined,
+    };
+
     this.placingOrder = true;
     this.ordersApi
-      .create({
-        userId,
-        restaurantId,
-        items: this.cartItems().map((item) => ({
-          menuItemId: item.menuItemId,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-        totalAmount: this.cartTotal(),
-        paymentMethod: payload.paymentMethod as any,
-        deliveryAddress: {
-          street: payload.street,
-          apartment: payload.apartment,
-          city: payload.city,
-          state: payload.state,
-          zipCode: payload.zipCode,
-          country: payload.country,
-        },
-        specialInstructions: payload.specialInstructions || undefined,
-      } as never)
+      .create(orderPayload)
       .subscribe({
-        next: (order) => {
+        next: () => {
           this.notification.success('Order placed successfully!');
           this.cartService.clear();
           this.checkoutForm.reset({ paymentMethod: 'credit_card' });
           this.showCheckoutModal.set(false);
-          this.router.navigate(['/orders', order._id || order.id]);
+          this.router.navigate(['/orders']);
         },
         error: (err) => {
           console.error('Could not place order', err);

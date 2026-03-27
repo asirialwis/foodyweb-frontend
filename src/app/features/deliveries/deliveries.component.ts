@@ -34,9 +34,8 @@ export class DeliveriesComponent implements OnInit {
     const status = this.statusFilter ? (this.statusFilter as DeliveryStatus) : undefined;
 
     if (!this.isDriver()) {
-      this.deliveriesApi.findAll({ status }).subscribe((response) => {
-        const deliveries = Array.isArray(response) ? response : response.deliveries;
-        this.deliveries.set(deliveries as Delivery[]);
+      this.deliveriesApi.findAll({ status }).subscribe((deliveries) => {
+        this.deliveries.set(deliveries);
       });
       return;
     }
@@ -47,20 +46,18 @@ export class DeliveriesComponent implements OnInit {
       return;
     }
 
-    this.driversApi.findAll().subscribe((response) => {
-      const drivers = Array.isArray(response) ? response : response.drivers;
-      const ownDriver = (drivers as Driver[]).find((driver: Driver) => driver.userId === userId);
+    this.driversApi.findAll().subscribe((drivers) => {
+      const ownDriver = drivers.find((driver: Driver) => driver.userId === userId);
       this.driverEntityId = ownDriver?._id ?? ownDriver?.id ?? null;
 
-      this.deliveriesApi.findAll({ status }).subscribe((delivResponse) => {
-        const deliveries = Array.isArray(delivResponse) ? delivResponse : delivResponse.deliveries;
+      this.deliveriesApi.findAll({ status }).subscribe((deliveries) => {
         if (!this.driverEntityId) {
           this.deliveries.set([]);
           return;
         }
 
         this.deliveries.set(
-          (deliveries as Delivery[]).filter((delivery: Delivery) => delivery.driverId === this.driverEntityId),
+          deliveries.filter((delivery: Delivery) => delivery.driverId === this.driverEntityId),
         );
       });
     });

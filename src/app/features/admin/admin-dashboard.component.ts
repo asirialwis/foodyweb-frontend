@@ -109,8 +109,7 @@ export class AdminDashboardComponent implements OnInit {
   private loadUsers(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.usersApi.findAll().subscribe({
-        next: (res) => {
-          const users = Array.isArray(res) ? res : (res as any).users || [];
+        next: (users) => {
           this.usersSignal.set(users);
           resolve();
         },
@@ -121,9 +120,8 @@ export class AdminDashboardComponent implements OnInit {
 
   private loadOrders(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.ordersApi.findAll({ limit: 100 }).subscribe({
-        next: (res) => {
-          const orders = Array.isArray(res) ? res : (res as any).orders || [];
+      this.ordersApi.findAll().subscribe({
+        next: (orders) => {
           this.ordersSignal.set(orders.slice(0, 50));
           resolve();
         },
@@ -134,9 +132,8 @@ export class AdminDashboardComponent implements OnInit {
 
   private loadDeliveries(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.deliveriesApi.findAll({ limit: 100 }).subscribe({
-        next: (res) => {
-          const deliveries = Array.isArray(res) ? res : (res as any).deliveries || [];
+      this.deliveriesApi.findAll().subscribe({
+        next: (deliveries) => {
           this.deliveriesSignal.set(deliveries.slice(0, 50));
           resolve();
         },
@@ -147,9 +144,8 @@ export class AdminDashboardComponent implements OnInit {
 
   private loadDrivers(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.driversApi.findAll({ limit: 100 }).subscribe({
-        next: (res) => {
-          const drivers = Array.isArray(res) ? res : (res as any).drivers || [];
+      this.driversApi.findAll().subscribe({
+        next: (drivers) => {
           this.driversSignal.set(drivers);
           resolve();
         },
@@ -160,9 +156,8 @@ export class AdminDashboardComponent implements OnInit {
 
   private loadRestaurants(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.restaurantsApi.findAll({ limit: 100 }).subscribe({
-        next: (res) => {
-          const restaurants = Array.isArray(res) ? res : (res as any).restaurants || [];
+      this.restaurantsApi.findAll().subscribe({
+        next: (restaurants) => {
           this.restaurantsSignal.set(restaurants);
           resolve();
         },
