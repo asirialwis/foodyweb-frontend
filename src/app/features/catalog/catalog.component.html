@@ -1,49 +1,32 @@
 <div class="min-h-screen bg-gray-50">
-  <!-- Navigation Header -->
-  <header class="sticky top-0 z-40 bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="flex items-center justify-between h-16">
-        <div class="flex items-center gap-2">
-          <div class="w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-            </svg>
-          </div>
-          <div>
-            <h1 class="text-lg font-bold text-gray-900">FoodyWeb</h1>
-            <p class="text-xs text-gray-500">Food Delivery</p>
-          </div>
-        </div>
-        <div class="hidden md:flex flex-1 mx-8">
-          <div class="relative w-full max-w-md">
-            <input
-              type="text"
-              class="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Search restaurants..."
-              (input)="onSearchChange($any($event.target).value)"
-            />
-            <svg class="absolute right-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-        </div>
-        <div class="flex items-center gap-4">
-          <button (click)="openCheckout()" class="relative p-2 hover:bg-gray-100 rounded-lg transition">
-            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            @if (cartCount() > 0) {
-              <span class="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {{ cartCount() }}
-              </span>
-            }
-          </button>
+  <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Search & Cart Toolbar -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+      <div class="flex-1 max-w-lg">
+        <div class="relative">
+          <input
+            type="text"
+            class="w-full pl-4 pr-12 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+            placeholder="Search restaurants..."
+            (input)="onSearchChange($any($event.target).value)"
+          />
+          <svg class="absolute right-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
       </div>
+      <button (click)="openCheckout()" class="relative p-2.5 hover:bg-gray-100 rounded-lg transition border border-gray-200 bg-white">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        @if (cartCount() > 0) {
+          <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+            {{ cartCount() }}
+          </span>
+        }
+      </button>
     </div>
-  </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
     @if (!selectedRestaurant()) {
       <div class="mb-12">
         <div class="mb-8">
