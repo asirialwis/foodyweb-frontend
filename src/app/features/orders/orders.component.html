@@ -187,18 +187,20 @@
               <!-- Right: Action buttons + chevron -->
               <div class="flex items-center gap-4 shrink-0" (click)="$event.stopPropagation()">
                 @if (canUpdateStatus(order)) {
-                  <button
-                    class="px-4 py-2 rounded-lg text-sm font-bold border transition-colors disabled:opacity-50"
-                    [ngClass]="{
-                      'bg-green-50 text-green-700 border-green-200 hover:bg-green-100': order.status === 'pending',
-                      'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100': order.status === 'confirmed',
-                      'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100': order.status === 'preparing'
-                    }"
-                    [disabled]="updatingOrderSignal() === (order._id || order.id)"
-                    (click)="updateOrderStatus(order, getNextStatus(order.status)!)"
+                  <select 
+                    class="p-2 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    [value]="order.status"
+                    [disabled]="updatingOrderSignal() === (order._id || order.id) || order.status === 'cancelled' || order.status === 'delivered' || order.status === 'picked_up'"
+                    (change)="updateOrderStatus(order, $any($event.target).value)"
                   >
-                    {{ updatingOrderSignal() === (order._id || order.id) ? 'Updating...' : getNextStatusLabel(order.status) }}
-                  </button>
+                    <option value="pending" [disabled]="order.status !== 'pending'">Pending</option>
+                    <option value="confirmed" [disabled]="['preparing', 'ready', 'picked_up', 'delivered'].includes(order.status || '')">Confirm Order</option>
+                    <option value="preparing" [disabled]="['ready', 'picked_up', 'delivered'].includes(order.status || '')">Preparing</option>
+                    <option value="ready">Ready for Pickup</option>
+                    <option value="picked_up" disabled>Picked Up (Driver)</option>
+                    <option value="delivered" disabled>Delivered (Driver)</option>
+                    <option value="cancelled">Cancel/Reject</option>
+                  </select>
                 }
                 <svg class="w-5 h-5 text-gray-400 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -323,28 +325,31 @@
           <!-- Actions -->
           <div class="flex flex-wrap gap-3 pt-4">
             @if (canUpdateStatus(selectedOrderSignal()!)) {
-              <button
-                class="flex-1 px-5 py-3 rounded-xl font-bold text-white shadow-sm transition-transform active:scale-95 disabled:opacity-50"
-                [ngClass]="{
-                  'bg-green-600 hover:bg-green-700': selectedOrderSignal()!.status === 'pending',
-                  'bg-purple-600 hover:bg-purple-700': selectedOrderSignal()!.status === 'confirmed',
-                  'bg-orange-600 hover:bg-orange-700': selectedOrderSignal()!.status === 'preparing'
-                }"
-                [disabled]="updatingOrderSignal() === (selectedOrderSignal()!._id || selectedOrderSignal()!.id)"
-                (click)="updateOrderStatus(selectedOrderSignal()!, getNextStatus(selectedOrderSignal()!.status)!)"
-              >
-                {{ updatingOrderSignal() === (selectedOrderSignal()!._id || selectedOrderSignal()!.id)
-                    ? 'Updating…'
-                    : getNextStatusLabel(selectedOrderSignal()!.status) }}
-              </button>
+              <div class="flex-1 min-w-[200px]">
+                <label class="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Update Status</label>
+                <select 
+                  class="w-full p-3 border border-gray-300 rounded-xl text-base font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  [value]="selectedOrderSignal()!.status"
+                  [disabled]="updatingOrderSignal() === (selectedOrderSignal()!._id || selectedOrderSignal()!.id) || selectedOrderSignal()!.status === 'cancelled' || selectedOrderSignal()!.status === 'delivered' || selectedOrderSignal()!.status === 'picked_up'"
+                  (change)="updateOrderStatus(selectedOrderSignal()!, $any($event.target).value)"
+                >
+                  <option value="pending" [disabled]="selectedOrderSignal()!.status !== 'pending'">Pending</option>
+                  <option value="confirmed" [disabled]="['preparing', 'ready', 'picked_up', 'delivered'].includes(selectedOrderSignal()!.status || '')">Confirm Order</option>
+                  <option value="preparing" [disabled]="['ready', 'picked_up', 'delivered'].includes(selectedOrderSignal()!.status || '')">Preparing</option>
+                  <option value="ready">Ready for Pickup</option>
+                  <option value="picked_up" disabled>Picked Up (Driver)</option>
+                  <option value="delivered" disabled>Delivered (Driver)</option>
+                  <option value="cancelled">Cancel/Reject</option>
+                </select>
+              </div>
             }
             @if (canCancel(selectedOrderSignal()!)) {
               <button
-                class="flex-1 px-5 py-3 bg-white border-2 border-red-100 text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors disabled:opacity-50"
+                class="flex-1 min-w-[150px] px-5 py-3 bg-white border border-red-200 text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors disabled:opacity-50 mt-auto"
                 [disabled]="updatingOrderSignal() === (selectedOrderSignal()!._id || selectedOrderSignal()!.id)"
                 (click)="cancelOrder(selectedOrderSignal()!)"
               >
-                ❌ Cancel Order
+                Cancel Order
               </button>
             }
             @if (selectedOrderSignal()!.status === 'delivered' && canCreateOrder()) {

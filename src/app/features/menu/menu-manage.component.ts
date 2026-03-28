@@ -30,7 +30,8 @@ export class MenuManageComponent implements OnInit {
       return this.allRestaurants();
     }
 
-    const ownerId = this.authSession.user()?.id;
+    const user = this.authSession.user();
+    const ownerId = user?.id || (user as any)?._id;
     return this.allRestaurants().filter((restaurant) => restaurant.ownerId === ownerId);
   });
 

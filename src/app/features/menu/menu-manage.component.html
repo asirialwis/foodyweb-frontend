@@ -16,7 +16,16 @@
     <!-- Add Item Form -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <h2 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">Add New Menu Item</h2>
-      <form [formGroup]="form" (ngSubmit)="create()" class="flex flex-col gap-4">
+      @if (availableRestaurants().length === 0 && !isAdmin()) {
+        <div class="bg-blue-50 text-blue-800 p-4 rounded-lg flex items-start gap-3 mb-4">
+          <span class="text-xl">ℹ️</span>
+          <div>
+            <h4 class="font-bold">No restaurants found</h4>
+            <p class="text-sm mt-1">You need to register a restaurant before you can add menu items. Head over to your Dashboard to set up your first restaurant!</p>
+          </div>
+        </div>
+      }
+      <form [formGroup]="form" (ngSubmit)="create()" class="flex flex-col gap-4" [class.opacity-50]="availableRestaurants().length === 0">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="flex flex-col gap-1">
             <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Restaurant *</label>
@@ -46,7 +55,7 @@
             <input formControlName="description" placeholder="Short description…" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
           </div>
         </div>
-        <button type="submit" [disabled]="form.invalid" class="self-start mt-2 px-6 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <button type="submit" [disabled]="form.invalid || availableRestaurants().length === 0" class="self-start mt-2 px-6 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
           + Add Menu Item
         </button>
       </form>
