@@ -1,37 +1,102 @@
-<section class="space-y-2 mb-8 py-4">
-  <h1>Menu workspace</h1>
-  <p>Add and manage dishes for your restaurants.</p>
-</section>
-
-<form class="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg" [formGroup]="form" (ngSubmit)="create()">
-  <select formControlName="restaurantId">
-    <option value="">Select restaurant</option>
-    @for (restaurant of availableRestaurants(); track restaurant._id ?? restaurant.id ?? restaurant.name) {
-      <option [value]="restaurant._id ?? restaurant.id">{{ restaurant.name }}</option>
-    }
-  </select>
-  <input formControlName="name" placeholder="Dish name" />
-  <input formControlName="category" placeholder="Category" />
-  <input formControlName="price" type="number" placeholder="Price" />
-  <input formControlName="description" placeholder="Description" />
-  <button type="submit" [disabled]="form.invalid">Add item</button>
-</form>
-
-<section class="space-y-4">
-  @for (item of items(); track item._id ?? item.id ?? item.name) {
-    <article class="bg-white rounded-lg border border-gray-200 p-6 mb-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-2xl shadow-sm">
+        🍽️
+      </div>
       <div>
-        <h3>{{ item.name }}</h3>
-        <p>{{ item.category }} • $ {{ item.price }}</p>
-        <small>{{ item.description || 'No description' }}</small>
+        <h1 class="text-2xl font-bold text-gray-900">Menu Workspace</h1>
+        <p class="text-sm text-gray-500 mt-1">Add and manage dishes across all your restaurants</p>
       </div>
+    </div>
+  </div>
 
-      <div class="flex gap-3">
-        <button type="button" (click)="toggleAvailability(item)">
-          {{ item.isAvailable === false ? 'Set available' : 'Set unavailable' }}
+  <div class="flex flex-col gap-8">
+    <!-- Add Item Form -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-4 pb-3 border-b border-gray-100">Add New Menu Item</h2>
+      <form [formGroup]="form" (ngSubmit)="create()" class="flex flex-col gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Restaurant *</label>
+            <select formControlName="restaurantId" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+              <option value="">Select a restaurant…</option>
+              @for (r of availableRestaurants(); track (r._id ?? r.id)) {
+                <option [value]="r._id ?? r.id">{{ r.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Item Name *</label>
+            <input formControlName="name" placeholder="e.g. Margherita Pizza" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Category *</label>
+            <input formControlName="category" placeholder="e.g. Main, Dessert" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Price (₹) *</label>
+            <input formControlName="price" type="number" step="0.5" min="0" placeholder="0.00" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-bold text-gray-500 uppercase tracking-wide">Description</label>
+            <input formControlName="description" placeholder="Short description…" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+        </div>
+        <button type="submit" [disabled]="form.invalid" class="self-start mt-2 px-6 py-2.5 bg-blue-600 text-white font-bold text-sm rounded-lg shadow-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+          + Add Menu Item
         </button>
-        <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded" (click)="remove(item)">Delete</button>
-      </div>
-    </article>
-  }
-</section>
+      </form>
+    </div>
+
+    <!-- Items List -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-bold text-gray-900 mb-6 pb-3 border-b border-gray-100">Your Menu Items ({{ items().length }})</h2>
+
+      @if (items().length === 0) {
+        <div class="py-12 px-4 text-center">
+          <p class="text-5xl mb-4">🍽️</p>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">No menu items yet</h3>
+          <p class="text-gray-500">Use the form above to add your first dish</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          @for (item of items(); track (item._id ?? item.id)) {
+            <div class="border border-gray-200 rounded-xl p-4 flex flex-col gap-3 transition-shadow hover:shadow-md" [class.opacity-60]="!item.isAvailable">
+              <div class="flex-1">
+                <span class="inline-block px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wide rounded-full mb-2">{{ item.category }}</span>
+                <h3 class="text-base font-bold text-gray-900 mb-1">{{ item.name }}</h3>
+                @if (item.description) {
+                  <p class="text-sm text-gray-500 mb-2 line-clamp-2">{{ item.description }}</p>
+                }
+                <p class="text-lg font-extrabold text-gray-900 mt-1">₹{{ item.price }}</p>
+              </div>
+              <div class="flex items-center gap-2 mt-2">
+                <button
+                  class="flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-colors"
+                  [class.bg-green-100]="item.isAvailable !== false"
+                  [class.text-green-800]="item.isAvailable !== false"
+                  [class.hover.bg-green-200]="item.isAvailable !== false"
+                  
+                  [class.bg-red-100]="item.isAvailable === false"
+                  [class.text-red-800]="item.isAvailable === false"
+                  [class.hover.bg-red-200]="item.isAvailable === false"
+                  
+                  (click)="toggleAvailability(item)"
+                >
+                  {{ item.isAvailable !== false ? '✓ Available' : '✗ Unavailable' }}
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 hover:text-red-600 transition-colors" (click)="remove(item)">
+                  🗑️
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

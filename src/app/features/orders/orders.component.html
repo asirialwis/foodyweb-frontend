@@ -1,279 +1,362 @@
-<div class="min-h-screen bg-gray-50">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <!-- Header -->
-  <header class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">{{ pageTitle() }}</h1>
-          <p class="text-gray-600 mt-1">{{ pageSubtitle() }}</p>
-        </div>
-        @if (canCreateOrder()) {
-          <a routerLink="/catalog" class="px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            New Order
-          </a>
-        }
-      </div>
+  <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">{{ pageTitle() }}</h1>
+      <p class="text-gray-500 mt-1">{{ pageSubtitle() }}</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+      @if (canManageStatus()) {
+        <a routerLink="/restaurants/manage" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors">
+          🏪 Manage Restaurants
+        </a>
+      }
+      @if (canCreateOrder()) {
+        <a routerLink="/catalog" class="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold shadow-sm hover:bg-blue-700 transition-colors">
+          + New Order
+        </a>
+      }
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-gray-600 text-sm">Total Orders</p>
-            <p class="text-3xl font-bold text-gray-900">{{ totalOrders() }}</p>
-          </div>
-          <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-          </div>
+  <main>
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg text-xl">📋</div>
+        <div>
+          <p class="text-2xl font-bold text-gray-900">{{ totalOrders() }}</p>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Total Orders</p>
         </div>
       </div>
-
-      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-gray-600 text-sm">Active Orders</p>
-            <p class="text-3xl font-bold text-gray-900">{{ activeOrders() }}</p>
-          </div>
-          <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </div>
+      <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 flex items-center justify-center bg-orange-50 text-orange-600 rounded-lg text-xl">⚡</div>
+        <div>
+          <p class="text-2xl font-bold text-gray-900">{{ activeOrders() }}</p>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Active</p>
         </div>
       </div>
-
-      <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-        <div class="flex items-center justify-between">
+      @if (canManageStatus()) {
+        <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex items-center gap-4">
+          <div class="w-12 h-12 flex items-center justify-center bg-yellow-50 text-yellow-600 rounded-lg text-xl">⏳</div>
           <div>
-            <p class="text-gray-600 text-sm">Delivered</p>
-            <p class="text-3xl font-bold text-gray-900">{{ deliveredOrders() }}</p>
+            <p class="text-2xl font-bold text-gray-900">{{ pendingOrders() }}</p>
+            <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Pending</p>
           </div>
-          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
+        </div>
+      }
+      <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 flex items-center justify-center bg-green-50 text-green-600 rounded-lg text-xl">✅</div>
+        <div>
+          <p class="text-2xl font-bold text-gray-900">{{ deliveredOrders() }}</p>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-wide">Delivered</p>
         </div>
       </div>
     </div>
 
-    <!-- Filters & Sorting -->
-    <div class="card mb-8">
-      <div class="flex flex-col md:flex-row gap-4">
-        <div class="flex-1">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Filter by Status</label>
-          <select 
-            [ngModel]="statusFilterSignal()"
-            (change)="statusFilterSignal.set($any($event.target).value)"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="">All Orders</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="preparing">Preparing</option>
-            <option value="ready">Ready</option>
-            <option value="picked_up">Picked Up</option>
-            <option value="in_transit">In Transit</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-        <div class="flex-1">
-          <label class="block text-sm font-semibold text-gray-700 mb-2">Sort By</label>
-          <select 
-            [ngModel]="sortBySignal()"
-            (change)="sortBySignal.set($any($event.target).value)"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="status">By Status</option>
-          </select>
-        </div>
+    <!-- Filters -->
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm mb-6 flex flex-wrap items-end gap-4">
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Filter by Status</label>
+        <select
+          [ngModel]="statusFilterSignal()"
+          (change)="statusFilterSignal.set($any($event.target).value)"
+          class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">All Orders</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="preparing">Preparing</option>
+          <option value="ready">Ready</option>
+          <option value="picked_up">Picked Up</option>
+          <option value="delivered">Delivered</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
       </div>
+      <div class="flex-1 min-w-[200px]">
+        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1.5">Sort By</label>
+        <select
+          [ngModel]="sortBySignal()"
+          (change)="sortBySignal.set($any($event.target).value)"
+          class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="status">By Status</option>
+        </select>
+      </div>
+      <button class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-50 transition-colors" (click)="loadOrders()" [disabled]="loadingSignal()">
+        {{ loadingSignal() ? '⟳' : '↻' }} Refresh
+      </button>
     </div>
 
-    <!-- Orders List -->
+    <!-- Loading -->
     @if (loadingSignal()) {
-      <div class="text-center py-12">
-        <div class="inline-block">
-          <div class="w-12 h-12 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin"></div>
-        </div>
-        <p class="text-gray-600 mt-4">Loading your orders...</p>
+      <div class="flex flex-col items-center justify-center py-20 text-gray-500 gap-4">
+        <div class="w-10 h-10 border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+        <p>Loading orders…</p>
       </div>
-    } @else if (filteredOrders().length === 0) {
-      <div class="card text-center py-12">
-        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-        </svg>
-        <h3 class="text-lg font-semibold text-gray-900 mt-4">No orders found</h3>
-        <p class="text-gray-600 mt-1">@if (canCreateOrder()) { Start ordering now! }</p>
+    }
+
+    <!-- Empty -->
+    @else if (filteredOrders().length === 0) {
+      <div class="bg-gray-50 border border-dashed border-gray-300 rounded-xl py-20 px-4 text-center">
+        <p class="text-5xl mb-4">📋</p>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">No orders found</h3>
+        <p class="text-gray-500 mb-6">
+          @if (statusFilterSignal()) { No orders match the selected filter. }
+          @else if (canCreateOrder()) { Browse restaurants to place your first order! }
+          @else { Orders will appear here as customers place them. }
+        </p>
         @if (canCreateOrder()) {
-          <a routerLink="/catalog" class="px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors inline-block">
-            Browse Restaurants
-          </a>
+          <a routerLink="/catalog" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-bold shadow-sm hover:bg-blue-700 transition-colors">Browse Restaurants</a>
         }
       </div>
-    } @else {
-      <div class="space-y-4">
+    }
+
+    <!-- Orders List -->
+    @else {
+      <div class="flex flex-col gap-4">
         @for (order of filteredOrders(); track (order._id || order.id)) {
-          <div class="card cursor-pointer hover:shadow-md transition" (click)="selectOrder(order)">
-            <div class="flex items-start justify-between gap-4">
+
+          <div
+            class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-shadow border-l-4"
+            [ngClass]="{
+              'border-l-yellow-400': order.status === 'pending',
+              'border-l-blue-400': order.status === 'confirmed',
+              'border-l-purple-400': order.status === 'preparing',
+              'border-l-green-400': order.status === 'ready' || order.status === 'delivered',
+              'border-l-orange-400': order.status === 'picked_up',
+              'border-l-red-400 opacity-70': order.status === 'cancelled'
+            }"
+            (click)="selectOrder(order)"
+          >
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-5">
+
+              <!-- Left: ID + status -->
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
-                  <h3 class="text-lg font-semibold text-gray-900">Order #{{ getOrderShortId(order._id) }}</h3>
-                  <span [ngClass]="statusBadgeClass(order.status)">
-                    {{ statusIcon(order.status) }} {{ order.status }}
+                  <span class="text-sm font-extrabold text-gray-900 font-mono tracking-wider">#{{ getOrderShortId(order._id) }}</span>
+                  <span class="px-3 py-1 rounded-full text-xs font-bold"
+                    [ngClass]="{
+                      'bg-yellow-100 text-yellow-800': order.status === 'pending',
+                      'bg-blue-100 text-blue-800': order.status === 'confirmed',
+                      'bg-purple-100 text-purple-800': order.status === 'preparing',
+                      'bg-green-100 text-green-800': order.status === 'ready' || order.status === 'delivered',
+                      'bg-orange-100 text-orange-800': order.status === 'picked_up',
+                      'bg-red-100 text-red-800': order.status === 'cancelled'
+                    }"
+                  >
+                    {{ statusIcon(order.status) }} {{ order.status | titlecase }}
                   </span>
                 </div>
-                <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                  <div>
-                    <p class="text-gray-500">Items</p>
-                    <p class="font-semibold text-gray-900">{{ order.items.length || 0 }} items</p>
+
+                @if (canManageStatus() && order.restaurantName) {
+                  <p class="text-sm font-semibold text-gray-600 mb-3">🏪 {{ order.restaurantName }}</p>
+                }
+
+                <div class="flex flex-wrap items-center gap-6 mb-3">
+                  <div class="flex flex-col">
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Items</span>
+                    <span class="text-sm font-bold text-gray-900">{{ order.items.length || 0 }}</span>
                   </div>
-                  <div>
-                    <p class="text-gray-500">Total</p>
-                    <p class="font-semibold text-gray-900">₹{{ order.totalAmount.toFixed(2) || '0.00' }}</p>
+                  <div class="flex flex-col">
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Total</span>
+                    <span class="text-sm font-extrabold text-orange-600">₹{{ order.totalAmount.toFixed(2) }}</span>
                   </div>
-                  @if (order.estimatedDeliveryTime) {
-                    <div>
-                      <p class="text-gray-500">Delivery Time</p>
-                      <p class="font-semibold text-gray-900">{{ order.estimatedDeliveryTime }}</p>
-                    </div>
-                  }
+                  <div class="flex flex-col">
+                    <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Payment</span>
+                    <span class="text-sm font-bold text-gray-900">{{ order.paymentStatus | titlecase }}</span>
+                  </div>
                   @if (order.createdAt) {
-                    <div>
-                      <p class="text-gray-500">Ordered</p>
-                      <p class="font-semibold text-gray-900">{{ order.createdAt | date: 'short' }}</p>
+                    <div class="flex flex-col">
+                      <span class="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Ordered</span>
+                      <span class="text-sm font-bold text-gray-900">{{ order.createdAt | date:'MMM d, h:mm a' }}</span>
                     </div>
                   }
                 </div>
+
+                <!-- Items preview -->
+                @if (order.items.length) {
+                  <p class="text-sm text-gray-500 mb-0">
+                    {{ getItemsPreview(order) }}
+                  </p>
+                }
               </div>
-              <div class="text-right">
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+              <!-- Right: Action buttons + chevron -->
+              <div class="flex items-center gap-4 shrink-0" (click)="$event.stopPropagation()">
+                @if (canUpdateStatus(order)) {
+                  <button
+                    class="px-4 py-2 rounded-lg text-sm font-bold border transition-colors disabled:opacity-50"
+                    [ngClass]="{
+                      'bg-green-50 text-green-700 border-green-200 hover:bg-green-100': order.status === 'pending',
+                      'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100': order.status === 'confirmed',
+                      'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100': order.status === 'preparing'
+                    }"
+                    [disabled]="updatingOrderSignal() === (order._id || order.id)"
+                    (click)="updateOrderStatus(order, getNextStatus(order.status)!)"
+                  >
+                    {{ updatingOrderSignal() === (order._id || order.id) ? 'Updating...' : getNextStatusLabel(order.status) }}
+                  </button>
+                }
+                <svg class="w-5 h-5 text-gray-400 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </div>
             </div>
           </div>
+
         }
       </div>
     }
   </main>
 
-  <!-- Order Details Modal -->
+  <!-- ── Order Details Modal ── -->
   @if (showDetailsSignal() && selectedOrderSignal()) {
-    <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="sticky top-0 bg-white border-b p-6 flex items-center justify-between">
-          <h2 class="text-2xl font-bold text-gray-900">Order Details</h2>
-          <button 
-            (click)="closeDetails()"
-            class="text-gray-400 hover:text-gray-600"
-          >
-            ✕
-          </button>
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" (click)="closeDetails()">
+      <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-xl" (click)="$event.stopPropagation()">
+        
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-100 bg-white">
+          <h2 class="text-xl font-bold text-gray-900">Order Details</h2>
+          <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 hover:text-gray-900 transition-colors" (click)="closeDetails()">✕</button>
         </div>
 
-        <div class="p-6 space-y-6">
-          <!-- Order Header -->
-          <div>
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-lg font-semibold text-gray-900">Order #{{ getOrderShortId(selectedOrderSignal()?._id) }}</h3>
-              <span [ngClass]="statusBadgeClass(selectedOrderSignal()?.status ?? 'pending')">
-                {{ statusIcon(selectedOrderSignal()?.status ?? 'pending') }} {{ selectedOrderSignal()?.status | titlecase }}
+        <div class="p-6 overflow-y-auto flex flex-col gap-6 bg-gray-50">
+          
+          <!-- Order ID + Status -->
+          <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-xl font-bold text-gray-900 font-mono tracking-wider">#{{ getOrderShortId(selectedOrderSignal()!._id) }}</h3>
+              <span class="px-3 py-1 rounded-full text-xs font-bold"
+                [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': selectedOrderSignal()!.status === 'pending',
+                  'bg-blue-100 text-blue-800': selectedOrderSignal()!.status === 'confirmed',
+                  'bg-purple-100 text-purple-800': selectedOrderSignal()!.status === 'preparing',
+                  'bg-green-100 text-green-800': selectedOrderSignal()!.status === 'ready' || selectedOrderSignal()!.status === 'delivered',
+                  'bg-orange-100 text-orange-800': selectedOrderSignal()!.status === 'picked_up',
+                  'bg-red-100 text-red-800': selectedOrderSignal()!.status === 'cancelled'
+                }">
+                {{ statusIcon(selectedOrderSignal()!.status) }}
+                {{ selectedOrderSignal()!.status | titlecase }}
               </span>
             </div>
-            <p class="text-gray-600">{{ selectedOrderSignal()?.createdAt | date: 'medium' }}</p>
+            @if (selectedOrderSignal()!.createdAt) {
+              <p class="text-sm text-gray-500">{{ selectedOrderSignal()!.createdAt | date:'full' }}</p>
+            }
+            @if (canManageStatus() && selectedOrderSignal()!.restaurantName) {
+              <p class="text-sm font-semibold text-gray-700 mt-2">🏪 {{ selectedOrderSignal()!.restaurantName }}</p>
+            }
           </div>
 
           <!-- Items -->
-          <div class="border-t pt-6">
-            <h4 class="font-semibold text-gray-900 mb-4">Order Items</h4>
-            <div class="space-y-3">
-              @for (item of selectedOrderSignal()?.items || []; track item.menuItemId) {
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div class="flex flex-col gap-2">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Order Items</h4>
+            <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+              @for (item of selectedOrderSignal()!.items; track item.menuItemId; let last = $last) {
+                <div class="flex justify-between p-4" [class.border-b]="!last" [class.border-gray-100]="!last">
                   <div>
-                    <p class="font-medium text-gray-900">{{ item.name }}</p>
-                    <p class="text-sm text-gray-600">Qty: {{ item.quantity }}</p>
+                    <p class="font-bold text-gray-900 text-sm mb-1">{{ item.name }}</p>
+                    <p class="text-sm text-gray-500">Qty: {{ item.quantity }}</p>
+                    @if (item.specialInstructions) {
+                      <p class="text-xs text-blue-600 bg-blue-50 py-1 px-2 rounded mt-2">💬 {{ item.specialInstructions }}</p>
+                    }
                   </div>
-                  <p class="font-semibold text-gray-900">₹{{ (item.price * item.quantity).toFixed(2) }}</p>
+                  <p class="font-bold text-orange-600">₹{{ (item.price * item.quantity).toFixed(2) }}</p>
                 </div>
               }
             </div>
           </div>
 
-          <!-- Pricing Summary -->
-          <div class="border-t pt-6">
-            <div class="space-y-2 text-sm">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Subtotal:</span>
-                <span class="font-semibold text-gray-900">₹{{ (selectedOrderSignal()?.subtotal ?? 0).toFixed(2) }}</span>
-              </div>
-              @if (selectedOrderSignal()?.tax) {
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Tax:</span>
-                  <span class="font-semibold text-gray-900">₹{{ (selectedOrderSignal()?.tax ?? 0).toFixed(2) }}</span>
-                </div>
-              }
-              @if (selectedOrderSignal()?.deliveryFee) {
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Delivery:</span>
-                  <span class="font-semibold text-gray-900">₹{{ (selectedOrderSignal()?.deliveryFee ?? 0).toFixed(2) }}</span>
-                </div>
-              }
-              <div class="border-t pt-2 flex justify-between text-base font-bold">
-                <span>Total:</span>
-                <span>₹{{ (selectedOrderSignal()?.totalAmount ?? 0).toFixed(2) }}</span>
-              </div>
+          <!-- Price Summary -->
+          <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm space-y-3">
+            <div class="flex justify-between text-sm text-gray-600">
+              <span>Subtotal</span>
+              <span class="font-semibold text-gray-900">₹{{ (selectedOrderSignal()!.subtotal ?? selectedOrderSignal()!.totalAmount).toFixed(2) }}</span>
+            </div>
+            @if (selectedOrderSignal()!.tax) {
+              <div class="flex justify-between text-sm text-gray-600"><span>Tax</span><span class="font-semibold text-gray-900">₹{{ selectedOrderSignal()!.tax!.toFixed(2) }}</span></div>
+            }
+            @if (selectedOrderSignal()!.deliveryFee) {
+              <div class="flex justify-between text-sm text-gray-600"><span>Delivery</span><span class="font-semibold text-gray-900">₹{{ selectedOrderSignal()!.deliveryFee!.toFixed(2) }}</span></div>
+            }
+            <div class="flex justify-between items-center text-base font-bold text-gray-900 pt-3 border-t border-gray-100">
+              <span>Total</span>
+              <span class="text-orange-600 text-lg">₹{{ selectedOrderSignal()!.totalAmount.toFixed(2) }}</span>
+            </div>
+          </div>
+
+          <!-- Payment -->
+          <div class="flex flex-col gap-2">
+            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Payment</h4>
+            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm grid grid-cols-2 gap-4">
+              <div><span class="block text-xs font-bold text-gray-400 uppercase">Method</span><span class="block font-bold text-gray-900 mt-1">{{ selectedOrderSignal()!.paymentMethod || '—' }}</span></div>
+              <div><span class="block text-xs font-bold text-gray-400 uppercase">Status</span><span class="block font-bold text-gray-900 mt-1">{{ selectedOrderSignal()!.paymentStatus | titlecase }}</span></div>
             </div>
           </div>
 
           <!-- Delivery Address -->
-          @if (selectedOrderSignal()?.deliveryAddress) {
-            <div class="border-t pt-6">
-              <h4 class="font-semibold text-gray-900 mb-3">Delivery Address</h4>
-              <p class="text-gray-600">
-              {{ formatDeliveryAddress(selectedOrderSignal()!.deliveryAddress) }}
-              </p>
+          @if (selectedOrderSignal()!.deliveryAddress) {
+            <div class="flex flex-col gap-2">
+              <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Delivery Address</h4>
+              <p class="text-sm text-gray-700 bg-white border border-gray-200 rounded-xl p-4 shadow-sm leading-relaxed">{{ formatDeliveryAddress(selectedOrderSignal()!.deliveryAddress) }}</p>
+            </div>
+          }
+
+          <!-- Special Instructions -->
+          @if (selectedOrderSignal()!.specialInstructions) {
+            <div class="flex flex-col gap-2">
+              <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Special Instructions</h4>
+              <p class="text-sm text-gray-700 bg-yellow-50 border border-yellow-200 rounded-xl p-4 shadow-sm">{{ selectedOrderSignal()!.specialInstructions }}</p>
+            </div>
+          }
+
+          <!-- Estimated Delivery -->
+          @if (selectedOrderSignal()!.estimatedDeliveryTime) {
+            <div class="flex flex-col gap-2">
+              <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Estimated Delivery</h4>
+              <p class="text-sm font-bold text-blue-600 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">⏱ {{ selectedOrderSignal()!.estimatedDeliveryTime | date:'medium' }}</p>
             </div>
           }
 
           <!-- Actions -->
-          <div class="border-t pt-6 flex gap-3">
-            @if (canCancel(selectedOrderSignal()!)) {
-              <button 
-                (click)="cancelOrder(selectedOrderSignal()!)"
-                class="flex-1 px-4 py-3 bg-red-500 text-white font-medium rounded-lg hover:bg-red-600 transition-colors"
+          <div class="flex flex-wrap gap-3 pt-4">
+            @if (canUpdateStatus(selectedOrderSignal()!)) {
+              <button
+                class="flex-1 px-5 py-3 rounded-xl font-bold text-white shadow-sm transition-transform active:scale-95 disabled:opacity-50"
+                [ngClass]="{
+                  'bg-green-600 hover:bg-green-700': selectedOrderSignal()!.status === 'pending',
+                  'bg-purple-600 hover:bg-purple-700': selectedOrderSignal()!.status === 'confirmed',
+                  'bg-orange-600 hover:bg-orange-700': selectedOrderSignal()!.status === 'preparing'
+                }"
+                [disabled]="updatingOrderSignal() === (selectedOrderSignal()!._id || selectedOrderSignal()!.id)"
+                (click)="updateOrderStatus(selectedOrderSignal()!, getNextStatus(selectedOrderSignal()!.status)!)"
               >
-                Cancel Order
+                {{ updatingOrderSignal() === (selectedOrderSignal()!._id || selectedOrderSignal()!.id)
+                    ? 'Updating…'
+                    : getNextStatusLabel(selectedOrderSignal()!.status) }}
               </button>
             }
-            @if (selectedOrderSignal()!.status === 'delivered') {
-              <button 
-                (click)="rateOrder(selectedOrderSignal()!)"
-                class="flex-1 px-4 py-3 bg-yellow-500 text-white font-medium rounded-lg hover:bg-yellow-600 transition-colors"
+            @if (canCancel(selectedOrderSignal()!)) {
+              <button
+                class="flex-1 px-5 py-3 bg-white border-2 border-red-100 text-red-600 rounded-xl font-bold hover:bg-red-50 transition-colors disabled:opacity-50"
+                [disabled]="updatingOrderSignal() === (selectedOrderSignal()!._id || selectedOrderSignal()!.id)"
+                (click)="cancelOrder(selectedOrderSignal()!)"
               >
+                ❌ Cancel Order
+              </button>
+            }
+            @if (selectedOrderSignal()!.status === 'delivered' && canCreateOrder()) {
+              <button class="flex-1 px-5 py-3 bg-yellow-100 text-yellow-800 rounded-xl font-bold hover:bg-yellow-200 transition-colors" (click)="rateOrder(selectedOrderSignal()!)">
                 ⭐ Rate Order
               </button>
             }
-            <button 
-              (click)="closeDetails()"
-              class="flex-1 px-4 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Close
-            </button>
+            <button class="px-5 py-3 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition-colors" (click)="closeDetails()">Close</button>
           </div>
         </div>
       </div>
     </div>
   }
+
 </div>

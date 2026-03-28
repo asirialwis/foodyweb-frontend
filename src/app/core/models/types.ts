@@ -16,7 +16,6 @@ export type OrderStatus =
   | 'preparing'
   | 'ready'
   | 'picked_up'
-  | 'in_transit'
   | 'delivered'
   | 'cancelled';
 
@@ -87,7 +86,7 @@ export interface Restaurant {
   id?: string;
   name: string;
   description?: string;
-  cuisine?: CuisineType[];
+  cuisine?: string[];
   address?: Address;
   phone?: string;
   email?: string;
