@@ -2,7 +2,7 @@
   <!-- Header -->
   <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
     <div class="flex items-center gap-4">
-      <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-3xl shadow-sm">🏪</div>
+      <div class="w-14 h-14 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center text-3xl shadow-sm">🏪</div>
       <div>
         <h1 class="text-3xl font-bold text-gray-900">Restaurant Dashboard</h1>
         <p class="text-sm text-gray-500 mt-1">Manage your restaurants, menus, and orders seamlessly</p>
@@ -12,7 +12,7 @@
       <button class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-semibold shadow-sm hover:bg-gray-50 transition-colors" (click)="loadRestaurants()">
         ↻ Refresh
       </button>
-      <button class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-semibold shadow-sm hover:bg-blue-700 transition-colors" (click)="openCreateRestaurantForm()">
+      <button class="px-5 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-semibold shadow-sm hover:bg-primary-700 transition-colors" (click)="openCreateRestaurantForm()">
         + Register New
       </button>
     </div>
@@ -28,7 +28,7 @@
       <p class="text-6xl mb-4">🏪</p>
       <h3 class="text-xl font-bold text-gray-900 mb-2">No restaurants registered yet</h3>
       <p class="text-gray-500 mb-6 max-w-md mx-auto">Start your journey by registering your first restaurant. You can then add your menu and start receiving orders!</p>
-      <button class="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold shadow-sm hover:bg-blue-700 transition-colors" (click)="openCreateRestaurantForm()">Register First Restaurant</button>
+      <button class="px-6 py-3 bg-primary-600 text-white rounded-lg font-bold shadow-sm hover:bg-primary-700 transition-colors" (click)="openCreateRestaurantForm()">Register First Restaurant</button>
     </div>
   } @else {
 
@@ -42,7 +42,7 @@
           @for (restaurant of restaurantsSignal(); track getRestaurantId(restaurant)) {
             <div 
               class="bg-white border-2 rounded-xl p-5 cursor-pointer transition-all hover:shadow-md"
-              [ngClass]="selectedRestaurantSignal()?._id === restaurant._id || selectedRestaurantSignal()?.id === restaurant.id ? 'border-blue-500 shadow-sm' : 'border-gray-200'"
+              [ngClass]="selectedRestaurantSignal()?._id === restaurant._id || selectedRestaurantSignal()?.id === restaurant.id ? 'border-primary-500 shadow-sm' : 'border-gray-200'"
               (click)="selectRestaurant(restaurant)"
             >
               <div class="flex justify-between items-start mb-2">
@@ -52,7 +52,7 @@
               <p class="text-sm text-gray-500 line-clamp-2 mb-3">{{ restaurant.description || 'No description provided' }}</p>
               <div class="flex flex-wrap gap-2">
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gray-100 text-gray-600">⭐ {{ restaurant.rating || 'New' }}</span>
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-50 text-blue-700">{{ restaurant.cuisine?.[0] || 'Various' }}</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-primary-50 text-primary-700">{{ restaurant.cuisine?.[0] || 'Various' }}</span>
               </div>
             </div>
           }
@@ -81,15 +81,15 @@
 
           <!-- Tabs -->
           <div class="flex overflow-x-auto border-b border-gray-200 px-2 bg-gray-50">
-            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors" [ngClass]="activeTabSignal() === 'overview' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('overview')">Overview</button>
-            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors" [ngClass]="activeTabSignal() === 'menu' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('menu')">Menu Management</button>
-            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors flex items-center gap-2" [ngClass]="activeTabSignal() === 'orders' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('orders')">
+            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors" [ngClass]="activeTabSignal() === 'overview' ? 'border-blue-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('overview')">Overview</button>
+            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors" [ngClass]="activeTabSignal() === 'menu' ? 'border-blue-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('menu')">Menu Management</button>
+            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors flex items-center gap-2" [ngClass]="activeTabSignal() === 'orders' ? 'border-blue-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('orders')">
               Live Orders
               @if (orderStats().pending > 0) {
                 <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full">{{ orderStats().pending }}</span>
               }
             </button>
-            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors" [ngClass]="activeTabSignal() === 'settings' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('settings')">Settings</button>
+            <button class="px-6 py-4 text-sm font-bold border-b-2 whitespace-nowrap transition-colors" [ngClass]="activeTabSignal() === 'settings' ? 'border-blue-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" (click)="setTab('settings')">Settings</button>
           </div>
 
           <!-- Tab Content -->
@@ -102,7 +102,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div class="bg-gray-50 border border-gray-100 rounded-lg p-4">
                     <p class="text-xs uppercase font-bold text-gray-500 tracking-wider">Live Orders</p>
-                    <p class="text-2xl font-bold text-blue-600 mt-1">{{ orderStats().pending }}</p>
+                    <p class="text-2xl font-bold text-primary-600 mt-1">{{ orderStats().pending }}</p>
                   </div>
                   <div class="bg-gray-50 border border-gray-100 rounded-lg p-4">
                     <p class="text-xs uppercase font-bold text-gray-500 tracking-wider">Menu Items</p>
@@ -150,12 +150,12 @@
                   <h3 class="text-base font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200">Quick Add Dish</h3>
                   <form [formGroup]="menuItemForm" (ngSubmit)="saveMenuItem()" class="flex flex-col gap-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div><input formControlName="name" placeholder="Dish name *" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none" /></div>
-                      <div><input formControlName="category" placeholder="Category *" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none" /></div>
-                      <div><input formControlName="price" type="number" step="0.5" placeholder="Price (₹) *" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none" /></div>
-                      <div><input formControlName="description" placeholder="Short description" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 outline-none" /></div>
+                      <div><input formControlName="name" placeholder="Dish name *" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 outline-none" /></div>
+                      <div><input formControlName="category" placeholder="Category *" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 outline-none" /></div>
+                      <div><input formControlName="price" type="number" step="0.5" placeholder="Price (₹) *" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 outline-none" /></div>
+                      <div><input formControlName="description" placeholder="Short description" class="w-full p-2.5 bg-white border border-gray-300 rounded text-sm focus:ring-2 focus:ring-primary-500 outline-none" /></div>
                     </div>
-                    <button type="submit" [disabled]="menuItemForm.invalid" class="self-start px-5 py-2 bg-blue-600 text-white text-sm font-bold rounded shadow-sm hover:bg-blue-700 disabled:opacity-50 transition-colors">
+                    <button type="submit" [disabled]="menuItemForm.invalid" class="self-start px-5 py-2 bg-primary-600 text-white text-sm font-bold rounded shadow-sm hover:bg-primary-700 disabled:opacity-50 transition-colors">
                       + Add to Menu
                     </button>
                   </form>
@@ -179,7 +179,7 @@
                             <div>
                               <div class="flex justify-between items-start">
                                 <h4 class="font-bold text-gray-900">{{ item.name }}</h4>
-                                <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase">{{ item.category }}</span>
+                                <span class="text-xs font-bold text-primary-600 bg-primary-50 px-2 py-0.5 rounded uppercase">{{ item.category }}</span>
                               </div>
                               <p class="text-xs text-gray-500 mt-1 line-clamp-2">{{ item.description || 'No description' }}</p>
                               <p class="font-bold text-gray-900 mt-2">₹{{ item.price }}</p>
@@ -204,7 +204,7 @@
               <div class="flex flex-col gap-4">
                 <div class="flex justify-between items-center mb-2 pb-2 border-b border-gray-100">
                   <h3 class="text-base font-bold text-gray-900">Manage Live Orders</h3>
-                  <button class="text-sm text-blue-600 font-bold hover:underline" (click)="loadOrdersForRestaurant(getRestaurantId(selectedRestaurantSignal()!)!)">↻ Refresh</button>
+                  <button class="text-sm text-primary-600 font-bold hover:underline" (click)="loadOrdersForRestaurant(getRestaurantId(selectedRestaurantSignal()!)!)">↻ Refresh</button>
                 </div>
 
                 @if (ordersSignal().length === 0) {
@@ -219,7 +219,7 @@
                   <div class="bg-white border-2 rounded-xl border-l-4 shadow-sm py-4 px-5 transition-all"
                     [ngClass]="{
                       'border-l-yellow-400 border-gray-200': order.status === 'pending',
-                      'border-l-blue-400 border-gray-200': order.status === 'confirmed',
+                      'border-l-primary-400 border-gray-200': order.status === 'confirmed',
                       'border-l-purple-400 border-gray-200': order.status === 'preparing',
                       'border-l-green-400 border-gray-200': order.status === 'ready' || order.status === 'delivered',
                       'border-l-orange-400 border-gray-200': order.status === 'picked_up',
@@ -234,7 +234,7 @@
                           <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider"
                             [ngClass]="{
                               'bg-yellow-100 text-yellow-800': order.status === 'pending',
-                              'bg-blue-100 text-blue-800': order.status === 'confirmed',
+                              'bg-primary-100 text-primary-800': order.status === 'confirmed',
                               'bg-purple-100 text-purple-800': order.status === 'preparing',
                               'bg-green-100 text-green-800': order.status === 'ready' || order.status === 'delivered',
                               'bg-orange-100 text-orange-800': order.status === 'picked_up',
@@ -255,7 +255,7 @@
 
                       <div class="flex items-center gap-3 border-t pt-3 md:border-t-0 md:pt-0">
                         <select 
-                          class="p-2 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                          class="p-2 border border-gray-300 rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
                           [value]="order.status"
                           [disabled]="updatingOrderSignal() === (order._id || order.id) || order.status === 'cancelled' || order.status === 'delivered' || order.status === 'picked_up'"
                           (change)="updateOrderStatus(order, $any($event.target).value)"
@@ -269,7 +269,7 @@
                           <option value="cancelled">Cancel/Reject</option>
                         </select>
                         @if (updatingOrderSignal() === (order._id || order.id)) {
-                          <span class="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></span>
+                          <span class="w-5 h-5 border-2 border-gray-300 border-t-primary-600 rounded-full animate-spin"></span>
                         }
                       </div>
 
@@ -333,19 +333,19 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div class="flex flex-col gap-1.5 md:col-span-2">
               <label class="text-sm font-bold text-gray-700">Restaurant Name *</label>
-              <input formControlName="name" placeholder="e.g. Delicious Bites" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+              <input formControlName="name" placeholder="e.g. Delicious Bites" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
             </div>
 
             <div class="flex flex-col gap-1.5 md:col-span-2">
               <label class="text-sm font-bold text-gray-700">Description</label>
-              <textarea formControlName="description" rows="2" placeholder="Tell customers about your restaurant..." class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"></textarea>
+              <textarea formControlName="description" rows="2" placeholder="Tell customers about your restaurant..." class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"></textarea>
             </div>
 
             <div class="flex flex-col gap-1.5 md:col-span-2">
               <label class="text-sm font-bold text-gray-700">Add cuisines</label>
               <div class="flex flex-wrap gap-2 mt-1">
                 @for (c of cuisineOptions; track c) {
-                  <button type="button" class="px-3 py-1.5 rounded-full text-xs font-bold border transition-colors" [ngClass]="isCuisineSelected(c) ? 'bg-blue-100 border-blue-200 text-blue-700' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'" (click)="toggleCuisine(c)">
+                  <button type="button" class="px-3 py-1.5 rounded-full text-xs font-bold border transition-colors" [ngClass]="isCuisineSelected(c) ? 'bg-primary-100 border-primary-200 text-primary-700' : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'" (click)="toggleCuisine(c)">
                     {{ c.replace('_', ' ') | titlecase }}
                   </button>
                 }
@@ -358,19 +358,19 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="flex flex-col gap-1.5 md:col-span-2">
                   <label class="text-xs font-bold text-gray-600 uppercase">Street Address</label>
-                  <input formControlName="street" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+                  <input formControlName="street" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
                 </div>
                 <div class="flex flex-col gap-1.5">
                   <label class="text-xs font-bold text-gray-600 uppercase">City</label>
-                  <input formControlName="city" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+                  <input formControlName="city" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
                 </div>
                 <div class="flex flex-col gap-1.5">
                   <label class="text-xs font-bold text-gray-600 uppercase">State/Province</label>
-                  <input formControlName="state" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+                  <input formControlName="state" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
                 </div>
                 <div class="flex flex-col gap-1.5">
                   <label class="text-xs font-bold text-gray-600 uppercase">Zip/Postal Code</label>
-                  <input formControlName="zipCode" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+                  <input formControlName="zipCode" class="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
                 </div>
               </div>
             </div>
@@ -378,18 +378,18 @@
             <!-- Contact -->
             <div class="flex flex-col gap-1.5">
               <label class="text-sm font-bold text-gray-700">Phone</label>
-              <input formControlName="phone" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+              <input formControlName="phone" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
             </div>
             
             <div class="flex flex-col gap-1.5">
               <label class="text-sm font-bold text-gray-700">Email</label>
-              <input formControlName="email" type="email" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" />
+              <input formControlName="email" type="email" class="w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none" />
             </div>
           </div>
 
           <div class="flex justify-end gap-3 pt-6 border-t border-gray-100">
             <button type="button" class="px-5 py-2.5 font-semibold text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" (click)="showRestaurantFormSignal.set(false)">Cancel</button>
-            <button type="submit" [disabled]="restaurantForm.invalid || savingSignal()" class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-lg shadow-sm hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center gap-2">
+            <button type="submit" [disabled]="restaurantForm.invalid || savingSignal()" class="px-6 py-2.5 bg-primary-600 text-white font-bold rounded-lg shadow-sm hover:bg-primary-700 transition-colors disabled:opacity-50 flex items-center gap-2">
               @if (savingSignal()) {
                 <span class="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin"></span>
               }
