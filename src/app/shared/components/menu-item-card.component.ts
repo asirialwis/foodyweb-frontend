@@ -63,10 +63,10 @@ import { MenuItem } from '../../core/models/types';
         <div class="flex items-baseline justify-between mb-3">
           <div class="flex items-baseline gap-2">
             @if (menuItem.discountPrice && menuItem.discountPrice < menuItem.price) {
-              <span class="text-lg font-bold text-gray-900">₹{{ menuItem.discountPrice }}</span>
-              <span class="text-sm text-gray-500 line-through">₹{{ menuItem.price }}</span>
+              <span class="text-lg font-bold text-gray-900">{{ menuItem.discountPrice | currency:'LKR':'Rs. ' }}</span>
+              <span class="text-sm text-gray-500 line-through">{{ menuItem.price | currency:'LKR':'Rs. ' }}</span>
             } @else {
-              <span class="text-lg font-bold text-gray-900">₹{{ menuItem.price }}</span>
+              <span class="text-lg font-bold text-gray-900">{{ menuItem.price | currency:'LKR':'Rs. ' }}</span>
             }
           </div>
           @if (menuItem.ratingCount && menuItem.ratingCount > 0) {

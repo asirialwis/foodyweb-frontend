@@ -49,3 +49,4 @@ Thumbs.db
 
 
 environments/environment.production.ts
+.zip*

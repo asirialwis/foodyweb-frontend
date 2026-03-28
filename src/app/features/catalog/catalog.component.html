@@ -109,7 +109,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span>{{ cartCount() }} items · ₹{{ cartTotal().toFixed(2) }}</span>
+            <span>{{ cartCount() }} items · {{ cartTotal() | currency:'USD':'Rs. ' }}</span>
           </button>
         </div>
       }
@@ -225,7 +225,7 @@
                     <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                       <div class="flex-1">
                         <p class="text-sm font-semibold text-gray-900">{{ item.name }}</p>
-                        <p class="text-xs text-gray-500">₹{{ item.price }}</p>
+                        <p class="text-xs text-gray-500">{{ item.price | currency:'LKR':'Rs. ' }}</p>
                       </div>
                       <div class="flex items-center gap-1 border border-gray-300 rounded-lg">
                         <button 
@@ -255,23 +255,23 @@
                 <div class="border-t pt-4 space-y-2 text-sm">
                   <div class="flex justify-between text-gray-600">
                     <span>Subtotal:</span>
-                    <span>₹{{ subtotal().toFixed(2) }}</span>
+                    <span>{{ subtotal() | currency:'LKR':'Rs. ' }}</span>
                   </div>
                   @if (tax() > 0) {
                     <div class="flex justify-between text-gray-600">
                       <span>Tax (10%):</span>
-                      <span>₹{{ tax().toFixed(2) }}</span>
+                      <span>{{ tax() | currency:'LKR':'Rs. ' }}</span>
                     </div>
                   }
                   @if (selectedRestaurant()?.deliveryFee) {
                     <div class="flex justify-between text-gray-600">
                       <span>Delivery:</span>
-                      <span>₹{{ selectedRestaurant()!.deliveryFee }}</span>
+                      <span>{{ selectedRestaurant()!.deliveryFee | currency:'LKR':'Rs. ' }}</span>
                     </div>
                   }
                   <div class="flex justify-between font-bold text-gray-900 text-base border-t pt-2 mt-2">
                     <span>Total:</span>
-                    <span>₹{{ cartTotal().toFixed(2) }}</span>
+                    <span>{{ cartTotal() | currency:'LKR':'Rs. ' }}</span>
                   </div>
                 </div>
 
@@ -406,21 +406,21 @@
           <div class="border-t pt-4 space-y-2 text-sm">
             <div class="flex justify-between">
               <span>Subtotal:</span>
-              <span>₹{{ subtotal().toFixed(2) }}</span>
+              <span>{{ subtotal() | currency:'LKR':'Rs. ' }}</span>
             </div>
             <div class="flex justify-between">
               <span>Tax:</span>
-              <span>₹{{ tax().toFixed(2) }}</span>
+              <span>{{ tax() | currency:'LKR':'Rs. ' }}</span>
             </div>
             @if (deliveryFee() > 0) {
               <div class="flex justify-between">
                 <span>Delivery Fee:</span>
-                <span>₹{{ deliveryFee().toFixed(2) }}</span>
+                <span>{{ deliveryFee() | currency:'LKR':'Rs. ' }}</span>
               </div>
             }
             <div class="flex justify-between font-bold text-base">
               <span>Total:</span>
-              <span>₹{{ cartTotal().toFixed(2) }}</span>
+              <span>{{ cartTotal() | currency:'LKR':'Rs. ' }}</span>
             </div>
           </div>
 

@@ -70,7 +70,7 @@ import { Restaurant } from '../../core/models/types';
         </div>
 
         @if (restaurant.deliveryFee) {
-          <div class="text-primary-600 font-semibold">₹{{ restaurant.deliveryFee }}</div>
+          <div class="text-primary-600 font-semibold">{{ restaurant.deliveryFee | currency:'LKR':'Rs. ' }}</div>
         }
       </div>
     </div>
