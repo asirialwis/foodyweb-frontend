@@ -48,5 +48,5 @@ __screenshots__/
 Thumbs.db
 
 
-environments/environment.production.ts
+environments/
 .zip*
