@@ -1,45 +1,122 @@
-<section class="space-y-2 mb-8 py-4">
-  <h1>Driver profile</h1>
-  <p>Register once, then switch online/offline based on your shift.</p>
-</section>
-
-@if (!myDriver()) {
-  <form class="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg" [formGroup]="form" (ngSubmit)="register()">
-    <input formControlName="vehicleNumber" placeholder="Vehicle number" />
-    <input formControlName="licenseNumber" placeholder="License number" />
-    <select formControlName="vehicleType">
-      <option value="bicycle">Bicycle</option>
-      <option value="motorcycle">Motorcycle</option>
-      <option value="car">Car</option>
-    </select>
-    <button type="submit" [disabled]="form.invalid">Register as driver</button>
-  </form>
-}
-
-@if (myDriver()) {
-  <section class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
-    <h3>{{ myDriver()?.vehicleType | titlecase }}</h3>
-    <p>Vehicle: {{ myDriver()?.vehicleNumber || 'N/A' }}</p>
-    <p>Status: {{ myDriver()?.isAvailable ? 'Online' : 'Offline' }}</p>
-
-    <div class="flex gap-3 mt-4">
-      <button type="button" (click)="toggleMyAvailability()">
-        {{ myDriver()?.isAvailable ? 'Go offline' : 'Go online' }}
-      </button>
-      <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded" (click)="deleteMyDriver()">Delete profile</button>
+<div class="min-h-screen bg-transparent p-4 md:p-8">
+  <section class="mb-8">
+    <div class="flex items-center gap-4 mb-2">
+      <div class="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center text-2xl shadow-sm">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900">Driver Roster</h1>
     </div>
+    <p class="text-gray-500 max-w-2xl text-sm">
+      @if (isAdmin()) { Manage food delivery operatives and monitor their working status. }
+      @else { Configure your delivery profile to start accepting assignments. }
+    </p>
   </section>
-}
 
-@if (isAdmin()) {
-  <section class="space-y-4">
-    <h2>All drivers</h2>
-    @for (driver of drivers(); track driver._id ?? driver.id ?? driver.userId) {
-      <article class="bg-white rounded-lg border border-gray-200 p-4">
-        <strong>{{ driver.userId }}</strong>
-        <span>{{ driver.vehicleType }}</span>
-        <span>{{ driver.isAvailable ? 'online' : 'offline' }}</span>
-      </article>
-    }
-  </section>
-}
+  @if (!isAdmin() && !myDriver()) {
+    <section class="max-w-2xl bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+      <div class="p-6 md:p-8 border-b border-gray-100 bg-gray-50">
+        <h2 class="text-xl font-bold text-gray-900">Become a Delivery Operative</h2>
+        <p class="text-sm text-gray-500 mt-1">Register your vehicle to start receiving trips.</p>
+      </div>
+      <form class="p-6 md:p-8" [formGroup]="form" (ngSubmit)="register()">
+        <div class="grid gap-6 mb-8">
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Vehicle Type</label>
+            <select formControlName="vehicleType" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-semibold text-gray-800">
+              <option value="bicycle">Bicycle</option>
+              <option value="motorcycle">Motorcycle</option>
+              <option value="car">Car</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Vehicle Plate Number</label>
+            <input formControlName="vehicleNumber" placeholder="e.g. ABC-1234" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-semibold text-gray-800" />
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-gray-700 mb-2">Driver's License Number</label>
+            <input formControlName="licenseNumber" placeholder="License Code" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-semibold text-gray-800" />
+          </div>
+        </div>
+        <button type="submit" [disabled]="form.invalid" class="w-full px-6 py-4 bg-primary-600 text-white font-bold rounded-xl shadow-lg hover:bg-primary-700 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide">
+          Register Driver Profile
+        </button>
+      </form>
+    </section>
+  }
+
+  @if (!isAdmin() && myDriver()) {
+    <section class="max-w-2xl bg-white rounded-xl shadow-sm border-2 transition-all p-8 mb-8" [ngClass]="myDriver()?.isAvailable ? 'border-green-500 shadow-green-100' : 'border-gray-200'">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-1">My Driver Profile</h2>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold"
+            [ngClass]="myDriver()?.isAvailable ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'">
+            <span class="w-2h h-2 rounded-full" [ngClass]="myDriver()?.isAvailable ? 'bg-green-500' : 'bg-gray-400'"></span>
+            {{ myDriver()?.isAvailable ? 'ONLINE & READY' : 'OFFLINE' }}
+          </span>
+        </div>
+        <div class="text-5xl border border-gray-100 bg-gray-50 rounded-xl p-4 shrink-0 shadow-inner">
+          {{ myDriver()?.vehicleType === 'bicycle' ? '🚲' : (myDriver()?.vehicleType === 'car' ? '🚗' : '🏍️') }}
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4 mb-8 bg-gray-50 p-6 rounded-xl border border-gray-100">
+        <div>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Vehicle Type</p>
+          <p class="text-lg font-bold text-gray-900">{{ myDriver()?.vehicleType | titlecase }}</p>
+        </div>
+        <div>
+          <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Plate Number</p>
+          <p class="text-lg font-bold text-gray-900 font-mono">{{ myDriver()?.vehicleNumber || 'N/A' }}</p>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4">
+        <button type="button" class="flex-1 px-6 py-4 rounded-xl font-bold shadow-sm transition-colors text-white text-lg"
+          [ngClass]="myDriver()?.isAvailable ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600'"
+          (click)="toggleMyAvailability()">
+          {{ myDriver()?.isAvailable ? 'Go Offline' : 'Go Online' }}
+        </button>
+        <button type="button" class="px-6 py-4 bg-red-50 text-red-600 font-bold border border-red-200 rounded-xl hover:bg-red-600 hover:text-white transition-colors" (click)="deleteMyDriver()">
+          Retire Profile
+        </button>
+      </div>
+    </section>
+  }
+
+  @if (isAdmin()) {
+    <section class="max-w-7xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (driver of drivers(); track driver._id ?? driver.id ?? driver.userId) {
+          <article class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:border-primary-500 transition-colors">
+            <header class="flex justify-between items-start mb-6">
+              <div class="w-12 h-12 rounded-full overflow-hidden border-2 shadow-sm bg-gray-100 text-center flex items-center justify-center text-xl" [ngClass]="driver.isAvailable ? 'border-green-400' : 'border-gray-200'">
+                👤
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest"
+                [ngClass]="driver.isAvailable ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'">
+                {{ driver.isAvailable ? 'Online' : 'Offline' }}
+              </span>
+            </header>
+            
+            <div class="flex-1 mb-4">
+              <h3 class="text-lg font-bold text-gray-900 leading-tight">Driver #{{ driver.userId.slice(-6) }}</h3>
+              <p class="text-sm font-bold text-primary-600">{{ driver.vehicleType | titlecase }}</p>
+            </div>
+            
+            <footer class="bg-gray-50 rounded-lg p-3 border border-gray-100 grid grid-cols-2 gap-2 text-sm">
+              <div>
+                <span class="text-gray-500 font-medium text-xs block uppercase">Ratings</span>
+                <span class="font-bold text-gray-900">{{ driver.rating ? driver.rating + '⭐' : 'No ratings' }}</span>
+              </div>
+              <div>
+                <span class="text-gray-500 font-medium text-xs block uppercase">Deliveries</span>
+                <span class="font-bold text-gray-900">{{ driver.totalDeliveries || 0 }}</span>
+              </div>
+            </footer>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</div>

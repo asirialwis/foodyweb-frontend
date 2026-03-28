@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { OrdersApiService } from '../../core/api/orders-api.service';
 import { DeliveriesApiService } from '../../core/api/deliveries-api.service';
 import { DriversApiService } from '../../core/api/drivers-api.service';
@@ -29,6 +30,7 @@ export class DriverDashboardComponent implements OnInit {
 
   readonly loadingSignal = signal(false);
   readonly savingSignal = signal(false);
+  readonly availableDeliveriesSignal = signal<DeliveryWithOrder[]>([]);
   readonly activeDeliveriesSignal = signal<DeliveryWithOrder[]>([]);
   readonly completedDeliveriesSignal = signal<DeliveryWithOrder[]>([]);
   readonly driverStatsSignal = signal({
@@ -54,9 +56,12 @@ export class DriverDashboardComponent implements OnInit {
 
   readonly filteredDeliveries = computed(() => {
     const status = this.statusFilterSignal();
+    const available = this.availableDeliveriesSignal();
     const active = this.activeDeliveriesSignal();
     
-    if (status === 'all') return active;
+    // If pending is selected, only show available. Otherwise, filter active.
+    if (status === 'all') return [...available, ...active];
+    if (status === 'pending') return available;
     return active.filter(d => d.status === status);
   });
 
@@ -82,19 +87,20 @@ export class DriverDashboardComponent implements OnInit {
       return;
     }
 
-    // Load active deliveries
-    this.deliveriesApi
-      .findByDriverId(driverId)
-      .subscribe({
-        next: (deliveries) => {
-          // Filter by status
-          const active = deliveries.filter(
+    // Load available (pending) orders and my orders
+    forkJoin({
+      available: this.deliveriesApi.findAll({ status: 'pending' }),
+      mine: this.deliveriesApi.findByDriverId(driverId)
+    }).subscribe({
+        next: ({ available, mine }) => {
+          const active = mine.filter(
             d => !['delivered', 'failed'].includes(d.status ?? 'pending')
           );
-          const completed = deliveries.filter(
+          const completed = mine.filter(
             d => ['delivered', 'failed'].includes(d.status ?? 'pending')
           );
 
+          this.availableDeliveriesSignal.set(available);
           this.activeDeliveriesSignal.set(active);
           this.completedDeliveriesSignal.set(completed);
           this.loadingSignal.set(false);
@@ -111,7 +117,9 @@ export class DriverDashboardComponent implements OnInit {
     // Backend doesn't have a stats endpoint - compute from loaded deliveries
     const active = this.activeDeliveriesSignal();
     const completed = this.completedDeliveriesSignal();
+    const available = this.availableDeliveriesSignal();
     const today = new Date().toDateString();
+    
     this.driverStatsSignal.set({
       totalDeliveries: active.length + completed.length,
       completedToday: completed.filter(d => d.createdAt && new Date(d.createdAt).toDateString() === today).length,
@@ -160,12 +168,13 @@ export class DriverDashboardComponent implements OnInit {
 
   acceptDelivery(delivery: DeliveryWithOrder): void {
     const deliveryId = delivery.id || delivery._id;
-    if (!deliveryId) return;
+    const driverId = this.authSession.user()?.id;
+    if (!deliveryId || !driverId) return;
 
     this.savingSignal.set(true);
 
     this.deliveriesApi
-      .updateStatus(deliveryId, 'assigned')
+      .assignDriver(deliveryId, driverId)
       .subscribe({
         next: () => {
           this.notification.success('Success', 'Delivery accepted');

@@ -23,6 +23,7 @@ export class DeliveriesComponent implements OnInit {
   statusFilter = '';
   private driverEntityId: string | null = null;
   readonly deliveries = signal<Delivery[]>([]);
+  readonly allDrivers = signal<Driver[]>([]);
 
   readonly isDriver = computed(() => this.authSession.user()?.role === 'delivery_driver');
 
@@ -34,6 +35,10 @@ export class DeliveriesComponent implements OnInit {
     const status = this.statusFilter ? (this.statusFilter as DeliveryStatus) : undefined;
 
     if (!this.isDriver()) {
+      // Fetch both deliveries and all drivers for the assign dropdown
+      this.driversApi.findAll().subscribe((drivers) => {
+        this.allDrivers.set(drivers);
+      });
       this.deliveriesApi.findAll({ status }).subscribe((deliveries) => {
         this.deliveries.set(deliveries);
       });
@@ -85,12 +90,12 @@ export class DeliveriesComponent implements OnInit {
     }
 
     const id = delivery._id ?? delivery.id;
-    if (!id || !driverId.trim()) {
+    if (!id || !driverId || !driverId.trim()) {
       return;
     }
 
     this.deliveriesApi.assignDriver(id, driverId.trim()).subscribe(() => {
-      this.notification.show({ type: 'success', text: 'Driver assigned' });
+      this.notification.show({ type: 'success', text: 'Driver assigned successfully!' });
       this.load();
     });
   }

@@ -61,6 +61,15 @@ export const routes: Routes = [
 					),
 			},
 			{
+				path: 'driver-dashboard',
+				canActivate: [roleGuard],
+				data: { roles: ['delivery_driver'] },
+				loadComponent: () =>
+					import('./features/drivers/driver-dashboard.component').then(
+						(m) => m.DriverDashboardComponent,
+					),
+			},
+			{
 				path: 'deliveries',
 				canActivate: [roleGuard],
 				data: { roles: ['delivery_driver', 'admin'] },

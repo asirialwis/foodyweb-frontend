@@ -47,7 +47,7 @@ export class AppShellComponent {
     if (role === 'delivery_driver') {
       return [
         { label: 'Overview', link: '/dashboard' },
-        { label: 'Deliveries', link: '/deliveries' },
+        { label: 'My Deliveries', link: '/driver-dashboard' },
         { label: 'Driver Profile', link: '/drivers' },
       ];
     }
