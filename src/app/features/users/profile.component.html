@@ -1,362 +1,185 @@
 <div class="min-h-screen bg-gray-50">
   <!-- Header -->
   <header class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 py-6">
-      <h1 class="text-3xl font-bold text-gray-900">My Account</h1>
-      <p class="text-gray-600 mt-1">Manage your profile, addresses, and preferences</p>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Account Profile</h1>
+      <p class="text-gray-500 mt-2 font-medium">Manage your personal information and application preferences.</p>
     </div>
   </header>
 
   <main class="max-w-7xl mx-auto px-4 py-8">
     @if (loadingSignal()) {
-      <div class="text-center py-12">
-        <div class="inline-block w-12 h-12 border-4 border-gray-200 border-t-primary-500 rounded-full animate-spin"></div>
-        <p class="text-gray-600 mt-4">Loading your profile...</p>
+      <div class="text-center py-16">
+        <div class="inline-block w-12 h-12 border-4 border-gray-100 border-t-primary-500 rounded-full animate-spin"></div>
+        <p class="text-gray-400 mt-4 font-bold tracking-widest uppercase text-sm">Synchronizing Securely...</p>
       </div>
     } @else {
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Sidebar: Stats & Avatar -->
-        <div class="lg:col-span-1">
-          <div class="card text-center">
-            <div class="w-24 h-24 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-4xl mx-auto mb-4">
+        <div class="lg:col-span-4 space-y-6">
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 text-center">
+            <div class="w-32 h-32 bg-primary-100 border-4 border-white shadow-lg rounded-full flex items-center justify-center text-primary-600 text-5xl font-bold mx-auto mb-6">
               {{ userSignal()?.firstName?.charAt(0) }}{{ userSignal()?.lastName?.charAt(0) }}
             </div>
-            <h2 class="text-xl font-bold text-gray-900">{{ userSignal()?.firstName }} {{ userSignal()?.lastName }}</h2>
-            <p class="text-gray-600 text-sm mt-1">{{ userSignal()?.email }}</p>
+            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">{{ userSignal()?.firstName }} {{ userSignal()?.lastName }}</h2>
+            <span class="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold uppercase tracking-widest mt-2 mb-4">
+              {{ userSignal()?.role }}
+            </span>
+            <p class="text-gray-500 text-sm break-all font-mono">{{ userSignal()?.email }}</p>
             
-            <div class="mt-6 space-y-4 border-t pt-6">
-              <div>
-                <p class="text-gray-600 text-sm">Member Since</p>
-                <p class="font-semibold text-gray-900">{{ stats().memberSince }}</p>
+            <div class="mt-8 space-y-4 border-t border-gray-100 pt-8">
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider">Member Since</span>
+                <span class="font-bold text-gray-900">{{ stats().memberSince }}</span>
               </div>
-              <div>
-                <p class="text-gray-600 text-sm">Rating</p>
-                <p class="font-semibold text-gray-900">
-                  ⭐ {{ stats().avgRating.toFixed(1) }}/5
-                </p>
-              </div>
-              <div>
-                <p class="text-gray-600 text-sm">Total Orders</p>
-                <p class="font-semibold text-gray-900">{{ stats().totalOrders }}</p>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500 text-sm font-semibold uppercase tracking-wider">Total Orders</span>
+                <span class="font-bold text-gray-900">{{ stats().totalOrders }}</span>
               </div>
             </div>
 
             <button 
               (click)="logout()"
-              class="w-full px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors mt-6"
+              class="w-full px-5 py-3 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-600 hover:text-white transition-colors mt-8 uppercase tracking-widest text-sm"
             >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
+              Sign Out
             </button>
           </div>
         </div>
 
-        <!-- Main Content: Profile, Addresses, Password -->
-        <div class="lg:col-span-2 space-y-8">
-          <!-- Profile Section -->
-          <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              Personal Information
-            </h3>
+        <!-- Main Content -->
+        <div class="lg:col-span-8 space-y-8">
+          <!-- Personal Info Card -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-6 md:p-8 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+              <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">Personal Information</h3>
+                <p class="text-sm text-gray-500">Update your name and contact details.</p>
+              </div>
+            </div>
 
-            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="space-y-4">
-              <div class="grid grid-cols-2 gap-4">
+            <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="p-6 md:p-8 space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
-                  <input
-                    formControlName="firstName"
-                    type="text"
-                    placeholder="John"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
+                  <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">First Name</label>
+                  <input formControlName="firstName" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-colors font-semibold text-gray-900" />
                 </div>
                 <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
-                  <input
-                    formControlName="lastName"
-                    type="text"
-                    placeholder="Doe"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
+                  <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">Last Name</label>
+                  <input formControlName="lastName" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-colors font-semibold text-gray-900" />
                 </div>
               </div>
 
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                <input
-                  formControlName="email"
-                  type="email"
-                  [disabled]="true"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
-                />
-                <p class="text-xs text-gray-500 mt-1">Email cannot be changed for security</p>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">Registered Email</label>
+                  <input formControlName="email" type="email" [disabled]="true" class="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 font-mono text-sm cursor-not-allowed" />
+                </div>
+                <div>
+                  <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">Phone Contact</label>
+                  <input formControlName="phone" type="tel" class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-colors font-semibold text-gray-900" />
+                </div>
               </div>
 
-              <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number</label>
-                <input
-                  formControlName="phone"
-                  type="tel"
-                  placeholder="9876543210"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-
-              <button
-                type="submit"
-                [disabled]="profileForm.invalid || savingSignal()"
-                class="w-full px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
-              >
-                @if (savingSignal()) {
-                  <span class="inline-block animate-spin mr-2">⟳</span>
-                  Saving...
-                } @else {
-                  Save Changes
-                }
+              <button type="submit" [disabled]="profileForm.invalid || savingSignal()" class="w-full md:w-auto px-8 py-3 bg-gray-900 text-white font-bold rounded-xl shadow-md hover:bg-gray-800 hover:shadow-lg transition-all disabled:opacity-50">
+                {{ savingSignal() ? 'Synchronizing...' : 'Save Profile Changes' }}
               </button>
             </form>
           </div>
 
-          <!-- Addresses Section -->
-          <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                Delivery Addresses
+          <!-- Exact Home Address Target -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-6 md:p-8 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                </div>
+                <div>
+                  <h3 class="text-xl font-bold text-gray-900">Primary Delivery Address</h3>
+                  <p class="text-sm text-gray-500">Your core fulfillment location.</p>
+                </div>
               </div>
-              @if (!showAddressFormSignal()) {
-                <button 
-                  (click)="showAddressFormSignal.set(true)"
-                  class="px-3 py-1.5 text-sm bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
-                >
-                  + Add Address
-                </button>
+              
+              @if (!showAddressFormSignal() && !addressSignal()) {
+                <button (click)="editAddress()" class="px-5 py-2.5 bg-primary-600 text-white font-bold text-sm tracking-wide rounded-lg hover:bg-primary-700 transition">Establish Address</button>
               }
-            </h3>
+            </div>
 
             @if (showAddressFormSignal()) {
-              <form [formGroup]="addressForm" class="space-y-4 mb-6 p-4 bg-gray-50 rounded-lg border-2 border-primary-200">
-                <h4 class="font-semibold text-gray-900">
-                  {{ editingAddressIndexSignal() !== null ? 'Edit Address' : 'Add New Address' }}
-                </h4>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Street Address</label>
-                  <input
-                    formControlName="street"
-                    type="text"
-                    placeholder="123 Main Street"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Apartment/Suite (Optional)</label>
-                  <input
-                    formControlName="apartment"
-                    type="text"
-                    placeholder="Apt 101"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">City</label>
-                    <input
-                      formControlName="city"
-                      type="text"
-                      placeholder="New York"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
+              <form [formGroup]="addressForm" class="p-6 md:p-8 space-y-6 bg-primary-50/30">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="md:col-span-2">
+                    <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">Street Name</label>
+                    <input formControlName="street" placeholder="123 Main Street" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500" />
                   </div>
                   <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">State</label>
-                    <input
-                      formControlName="state"
-                      type="text"
-                      placeholder="NY"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
+                    <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">City</label>
+                    <input formControlName="city" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">State / Province</label>
+                    <input formControlName="state" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">Postal Code</label>
+                    <input formControlName="zipCode" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500" />
+                  </div>
+                  <div>
+                    <label class="block text-sm font-bold text-gray-700 tracking-wide uppercase mb-2">Country Code</label>
+                    <input formControlName="country" class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500" />
                   </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Zip Code</label>
-                    <input
-                      formControlName="zipCode"
-                      type="text"
-                      placeholder="10001"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-                  <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Country</label>
-                    <input
-                      formControlName="country"
-                      type="text"
-                      placeholder="USA"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    />
-                  </div>
-                </div>
-
-                <div class="flex items-center">
-                  <input
-                    id="isDefault"
-                    type="checkbox"
-                    formControlName="isDefault"
-                    class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-                  />
-                  <label for="isDefault" class="ml-3 text-sm font-medium text-gray-700">
-                    Set as default delivery address
-                  </label>
-                </div>
-
-                <div class="flex gap-3">
-                  <button
-                    type="button"
-                    (click)="editingAddressIndexSignal() !== null ? updateAddress(editingAddressIndexSignal()!) : addAddress()"
-                    [disabled]="addressForm.invalid || savingSignal()"
-                    class="flex-1 px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
-                  >
-                    {{ editingAddressIndexSignal() !== null ? 'Update Address' : 'Add Address' }}
+                <div class="flex gap-4 pt-4">
+                  <button type="button" (click)="saveAddress()" [disabled]="addressForm.invalid || savingSignal()" class="px-8 py-3 bg-primary-600 text-white font-bold rounded-xl hover:bg-primary-700 transition disabled:opacity-50">
+                    Commit Address
                   </button>
-                  <button
-                    type="button"
-                    (click)="cancelAddressForm()"
-                    class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                  >
+                  <button type="button" (click)="cancelAddressForm()" class="px-8 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200 transition">
                     Cancel
                   </button>
                 </div>
               </form>
             }
 
-            @if (addresses().length > 0) {
-              <div class="space-y-3">
-                @for (address of addresses(); track $index) {
-                  <div class="p-4 border border-gray-300 rounded-lg hover:border-primary-500 transition">
-                    <div class="flex items-start justify-between">
-                      <div class="flex-1">
-                        <p class="font-semibold text-gray-900">
-                          {{ address.street }}
-                          @if (address.label === 'home') {
-                            <span class="ml-2 text-xs font-bold bg-green-100 text-green-800 px-2 py-1 rounded">DEFAULT</span>
-                          }
-                        </p>
-                        <p class="text-sm text-gray-600">
-                          @if (address.apartment) {
-                            {{ address.apartment }},
-                          }
-                          {{ address.city }}, {{ address.state }} {{ address.zipCode }}
-                        </p>
-                        <p class="text-xs text-gray-500 mt-1">{{ address.country }}</p>
-                      </div>
-                      <div class="flex gap-2">
-                        <button 
-                          (click)="editAddress($index)"
-                          class="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          (click)="deleteAddress($index)"
-                          class="px-3 py-1.5 text-sm bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
+            @if (addressSignal() && !showAddressFormSignal()) {
+              <div class="p-6 md:p-8">
+                <div class="border-2 border-primary-200 bg-primary-50/50 rounded-xl p-6 relative group hover:border-primary-400 transition-colors">
+                  <div class="absolute top-6 right-6 flex gap-2">
+                    <button (click)="editAddress()" class="px-3 py-1.5 bg-white text-gray-700 border border-gray-200 rounded-lg text-sm font-bold hover:bg-gray-50 shadow-sm transition">Modifiy</button>
+                    <button (click)="deleteAddress()" class="px-3 py-1.5 bg-red-100 text-red-700 font-bold rounded-lg text-sm hover:bg-red-200 transition">Remove</button>
                   </div>
-                }
+                  
+                  <span class="inline-block px-2.5 py-1 bg-primary-600 text-white text-[10px] font-bold uppercase tracking-widest rounded mb-3">Active Address Array</span>
+                  <p class="text-xl font-bold text-gray-900 mb-1">{{ addressSignal()!.street }}</p>
+                  <p class="text-gray-600 font-medium">
+                    {{ addressSignal()!.city }}, {{ addressSignal()!.state }} {{ addressSignal()!.zipCode }}
+                  </p>
+                  <p class="text-gray-400 font-bold text-sm mt-2 uppercase tracking-wide">{{ addressSignal()!.country }}</p>
+                </div>
               </div>
-            } @else if (!showAddressFormSignal()) {
-              <p class="text-gray-600 text-center py-8">No addresses yet. Add one to get started.</p>
+            } @else if (!addressSignal() && !showAddressFormSignal()) {
+              <div class="p-12 text-center">
+                <p class="text-6xl mb-4 opacity-50">📍</p>
+                <p class="text-gray-500 font-medium mb-1">No delivery target established.</p>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Connect an address to finalize orders</p>
+              </div>
             }
           </div>
 
-          <!-- Password Section -->
-          <div class="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-            <h3 class="text-lg font-bold text-gray-900 mb-6 flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Change Password
+          <!-- Security Area -->
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden opacity-75 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-300">
+            <div class="p-6 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+              <div class="w-10 h-10 bg-gray-200 text-gray-600 rounded-lg flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
               </div>
-              @if (!showPasswordFormSignal()) {
-                <button 
-                  (click)="showPasswordFormSignal.set(true)"
-                  class="px-3 py-1.5 text-sm border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Change
-                </button>
-              }
-            </h3>
-
-            @if (showPasswordFormSignal()) {
-              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="space-y-4">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Current Password</label>
-                  <input
-                    formControlName="currentPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">New Password</label>
-                  <input
-                    formControlName="newPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                  <p class="text-xs text-gray-500 mt-1">At least 8 characters</p>
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Confirm Password</label>
-                  <input
-                    formControlName="confirmPassword"
-                    type="password"
-                    placeholder="••••••••"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-
-                <div class="flex gap-3">
-                  <button
-                    type="submit"
-                    [disabled]="passwordForm.invalid || savingSignal()"
-                    class="flex-1 px-4 py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 transition-colors"
-                  >
-                    Update Password
-                  </button>
-                  <button
-                    type="button"
-                    (click)="showPasswordFormSignal.set(false)"
-                    class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            } @else {
-              <p class="text-gray-600">Keep your account secure with a strong password.</p>
-            }
+              <div class="flex-1">
+                <h3 class="text-xl font-bold text-gray-900">Security Parameters</h3>
+              </div>
+              <button (click)="changePassword()" class="px-4 py-2 bg-gray-900 text-white font-bold text-sm rounded-lg">Change Password</button>
+            </div>
           </div>
         </div>
       </div>

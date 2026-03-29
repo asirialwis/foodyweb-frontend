@@ -25,7 +25,6 @@ export class ProfileComponent implements OnInit {
   readonly loadingSignal = signal(false);
   readonly savingSignal = signal(false);
   readonly showAddressFormSignal = signal(false);
-  readonly editingAddressIndexSignal = signal<number | null>(null);
   readonly showPasswordFormSignal = signal(false);
 
   readonly profileForm = this.fb.nonNullable.group({
@@ -52,7 +51,7 @@ export class ProfileComponent implements OnInit {
     confirmPassword: ['', [Validators.required]],
   });
 
-  readonly addresses = signal<Address[]>([]);
+  readonly addressSignal = signal<Address | null>(null);
   readonly totalOrders = signal(0);
 
   readonly stats = computed(() => ({
@@ -70,7 +69,7 @@ export class ProfileComponent implements OnInit {
     if (!user) return;
 
     this.loadingSignal.set(true);
-    this.usersApi.findById(user.id).subscribe({
+    this.usersApi.getProfile().subscribe({
       next: (userData: User) => {
         this.profileForm.patchValue({
           firstName: userData.firstName || '',
@@ -80,8 +79,10 @@ export class ProfileComponent implements OnInit {
           avatar: userData.avatar || '',
         });
 
-        if (userData.addresses) {
-          this.addresses.set(userData.addresses);
+        if (userData.address) {
+          this.addressSignal.set(userData.address);
+        } else {
+          this.addressSignal.set(null);
         }
 
         this.totalOrders.set((userData as any).totalOrders || 0);
@@ -107,14 +108,12 @@ export class ProfileComponent implements OnInit {
       firstName: this.profileForm.get('firstName')?.value || '',
       lastName: this.profileForm.get('lastName')?.value || '',
       phone: this.profileForm.get('phone')?.value || '',
-      avatar: this.profileForm.get('avatar')?.value || '',
+      // avatar: this.profileForm.get('avatar')?.value || '',
     };
 
-    // Backend uses PATCH /users/:id to update profile
     this.usersApi.update(user.id, payload).subscribe({
-      next: (updatedUser) => {
+      next: () => {
         this.notification.success('Profile updated', 'Your changes have been saved');
-        // Update session with new data
         this.authSession.setSession(
           this.authSession.token() ?? '',
           { ...user, ...payload },
@@ -129,7 +128,7 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  addAddress(): void {
+  saveAddress(): void {
     if (this.addressForm.invalid) return;
 
     this.savingSignal.set(true);
@@ -137,60 +136,33 @@ export class ProfileComponent implements OnInit {
     if (!user) return;
 
     const payload = this.addressForm.getRawValue();
-    // Backend stores a single address on the user record via PATCH /users/:id
-    const currentAddresses = [...this.addresses()];
-    currentAddresses.push(payload as Address);
+
     this.usersApi.update(user.id, { address: payload } as any).subscribe({
       next: () => {
-        this.notification.success('Address added', 'New address saved successfully');
-        this.addressForm.reset();
+        this.notification.success('Address saved', 'Your primary address is logged');
         this.showAddressFormSignal.set(false);
-        this.addresses.set(currentAddresses);
+        this.addressSignal.set(payload as Address);
         this.savingSignal.set(false);
       },
       error: (err: any) => {
-        this.notification.error('Failed to add address', err?.error?.message);
+        this.notification.error('Failed to save address', err?.error?.message);
         this.savingSignal.set(false);
       },
     });
   }
 
-  updateAddress(index: number): void {
-    if (this.addressForm.invalid) return;
+  deleteAddress(): void {
+    if (!confirm('Are you sure you want to remove your home address?')) return;
 
-    this.savingSignal.set(true);
-    const user = this.userSignal();
-    if (!user) return;
-    const payload = this.addressForm.getRawValue();
-
-    this.usersApi.update(user.id, { address: payload } as any).subscribe({
-      next: () => {
-        this.notification.success('Address updated', 'Your address has been updated');
-        this.addressForm.reset();
-        this.editingAddressIndexSignal.set(null);
-        this.savingSignal.set(false);
-        this.loadProfile();
-      },
-      error: (err: any) => {
-        this.notification.error('Failed to update address', err?.error?.message);
-        this.savingSignal.set(false);
-      },
-    });
-  }
-
-  deleteAddress(index: number): void {
-    if (!confirm('Are you sure you want to delete this address?')) return;
-
-    // Backend doesn't have a dedicated delete-address endpoint.
-    // Update user to remove address.
     const user = this.userSignal();
     if (!user) return;
 
     this.savingSignal.set(true);
+    // Explicitly pushing null to the user schema
     this.usersApi.update(user.id, { address: null } as any).subscribe({
       next: () => {
-        this.notification.success('Address deleted', 'Address removed successfully');
-        this.addresses.set([]);
+        this.notification.success('Address cleared', 'Address removed successfully');
+        this.addressSignal.set(null);
         this.savingSignal.set(false);
       },
       error: (err) => {
@@ -200,27 +172,25 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  editAddress(index: number): void {
-    const address = this.addresses()[index];
-    if (!address) return;
-
-    this.addressForm.patchValue({
-      street: address.street || '',
-      apartment: address.apartment || '',
-      city: address.city || '',
-      state: address.state || '',
-      zipCode: address.zipCode || '',
-      country: address.country || '',
-      isDefault: address.label === 'home' || false,
-    });
-
-    this.editingAddressIndexSignal.set(index);
+  editAddress(): void {
+    const address = this.addressSignal();
+    if (address) {
+      this.addressForm.patchValue({
+        street: address.street || '',
+        apartment: address.apartment || '',
+        city: address.city || '',
+        state: address.state || '',
+        zipCode: address.zipCode || '',
+        country: address.country || '',
+        isDefault: true,
+      });
+    } else {
+      this.addressForm.reset();
+    }
     this.showAddressFormSignal.set(true);
   }
 
   cancelAddressForm(): void {
-    this.addressForm.reset();
-    this.editingAddressIndexSignal.set(null);
     this.showAddressFormSignal.set(false);
   }
 
@@ -234,19 +204,12 @@ export class ProfileComponent implements OnInit {
     }
 
     this.savingSignal.set(true);
-    // Backend doesn't have a change-password endpoint.
-    // Use PATCH /users/:id if available.
-    const user = this.userSignal();
-    if (!user) return;
-
-    this.notification.info('Password change is not yet supported by the backend.');
+    this.notification.info('Info', 'Password change requires independent backend endpoints currently pending.');
     this.savingSignal.set(false);
   }
 
   logout(): void {
     if (!confirm('Are you sure you want to logout?')) return;
-
-    // Backend doesn't have a logout endpoint — just clear the client session
     this.authSession.clearSession();
     this.notification.success('Logged out', 'You have been logged out');
     this.router.navigateByUrl('/login');

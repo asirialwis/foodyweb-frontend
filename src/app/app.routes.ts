@@ -94,6 +94,13 @@ export const routes: Routes = [
 						(m) => m.UsersAdminComponent,
 					),
 			},
+			{
+				path: 'profile',
+				loadComponent: () =>
+					import('./features/users/profile.component').then(
+						(m) => m.ProfileComponent,
+					),
+			},
 			{ path: '', redirectTo: 'catalog', pathMatch: 'full' },
 		],
 	},

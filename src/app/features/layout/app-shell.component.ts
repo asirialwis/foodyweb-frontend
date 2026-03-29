@@ -32,6 +32,7 @@ export class AppShellComponent {
       return [
         { label: 'Discover', link: '/catalog' },
         { label: 'Orders', link: '/orders' },
+        { label: 'My Profile', link: '/profile' },
       ];
     }
 
@@ -41,6 +42,7 @@ export class AppShellComponent {
         { label: 'Restaurants', link: '/restaurants/manage' },
         { label: 'Menu', link: '/menu/manage' },
         { label: 'Orders', link: '/orders' },
+        { label: 'My Profile', link: '/profile' },
       ];
     }
 
@@ -48,7 +50,8 @@ export class AppShellComponent {
       return [
         { label: 'Overview', link: '/dashboard' },
         { label: 'My Deliveries', link: '/driver-dashboard' },
-        { label: 'Driver Profile', link: '/drivers' },
+        { label: 'Driver Fleet', link: '/drivers' },
+        { label: 'My Profile', link: '/profile' },
       ];
     }
 
@@ -59,7 +62,9 @@ export class AppShellComponent {
       { label: 'Restaurants', link: '/restaurants/manage' },
       { label: 'Menu', link: '/menu/manage' },
       { label: 'Deliveries', link: '/deliveries' },
+      { label: 'Driver Fleet', link: '/drivers' },
       { label: 'Users', link: '/users' },
+      { label: 'My Profile', link: '/profile' },
     ];
   });
 
