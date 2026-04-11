@@ -1,32 +1,243 @@
-<section class="space-y-2 mb-8 py-4">
-  <h1>User administration</h1>
-  <p>Manage account roles and basic profile details.</p>
-</section>
+<div class="min-h-screen bg-gray-50/80 p-4 md:p-8">
+  <section class="mb-8">
+    <div class="flex items-center gap-4 mb-2">
+      <div
+        class="w-12 h-12 bg-primary-100 text-primary-600 rounded-xl flex items-center justify-center text-2xl shadow-sm"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
+          />
+        </svg>
+      </div>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">User administration</h1>
+        <p class="text-gray-500 text-sm mt-0.5">Browse accounts and open a user to edit roles or profile details.</p>
+      </div>
+    </div>
+  </section>
 
-<section class="space-y-4">
-  @for (user of users(); track user.id ?? user.email) {
-    <article class="bg-white rounded-lg border border-gray-200 p-6 mb-4">
-      <header>
-        <strong>{{ user.firstName }} {{ user.lastName }}</strong>
-        <span>{{ user.role }}</span>
-      </header>
+  <!-- View: list -->
+  <section class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+    @if (users().length === 0) {
+      <p class="p-10 text-center text-gray-500 text-sm">No users loaded yet.</p>
+    } @else {
+      <!-- Desktop: table keeps header and cells on one grid -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full table-fixed border-collapse text-sm">
+          <colgroup>
+            <col class="w-[26%]" />
+            <col class="w-[26%]" />
+            <col class="w-[14%]" />
+            <col class="w-[16%]" />
+            <col class="w-[18%]" />
+          </colgroup>
+          <thead>
+            <tr class="border-b border-gray-100 bg-gray-50 text-left text-xs font-bold uppercase tracking-wider text-gray-500">
+              <th scope="col" class="px-6 py-3 align-middle">User</th>
+              <th scope="col" class="px-6 py-3 align-middle">Email</th>
+              <th scope="col" class="px-6 py-3 align-middle">Phone</th>
+              <th scope="col" class="px-6 py-3 text-center align-middle">Role</th>
+              <th scope="col" class="px-6 py-3 text-right align-middle">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (user of users(); track userId(user) ?? user.email) {
+              <tr class="hover:bg-gray-50/80 transition-colors">
+                <td class="px-6 py-4 align-middle">
+                  <div class="flex items-center gap-3 min-w-0">
+                    <div
+                      class="w-10 h-10 shrink-0 rounded-full bg-primary-100 text-primary-700 font-bold text-xs flex items-center justify-center uppercase"
+                    >
+                      {{ (user.firstName || '?').slice(0, 1) }}{{ (user.lastName || '').slice(0, 1) }}
+                    </div>
+                    <p class="min-w-0 font-bold text-gray-900 truncate">
+                      {{ user.firstName || '—' }} {{ user.lastName || '' }}
+                    </p>
+                  </div>
+                </td>
+                <td class="px-6 py-4 align-middle text-gray-600">
+                  <span class="block truncate" [title]="user.email">{{ user.email }}</span>
+                </td>
+                <td class="px-6 py-4 align-middle text-gray-600 tabular-nums">
+                  {{ user.phone || '—' }}
+                </td>
+                <td class="px-6 py-4 align-middle text-center">
+                  <span
+                    class="inline-flex max-w-full justify-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200/80"
+                  >
+                    {{ roleLabel(user.role) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 align-middle text-right">
+                  @if (userId(user)) {
+                    <div class="inline-flex flex-wrap items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        (click)="openEdit(user)"
+                        class="px-3 py-1.5 text-xs font-bold rounded-lg border border-primary-200 text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors whitespace-nowrap"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        (click)="remove(user)"
+                        class="px-3 py-1.5 text-xs font-bold rounded-lg border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition-colors whitespace-nowrap"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
 
-      <p>{{ user.email }}</p>
+      <!-- Mobile: stacked cards -->
+      <ul class="md:hidden divide-y divide-gray-100">
+        @for (user of users(); track userId(user) ?? user.email) {
+          <li class="px-5 py-4 hover:bg-gray-50/80 transition-colors">
+            <div class="flex items-start gap-3 min-w-0 mb-3">
+              <div
+                class="w-11 h-11 shrink-0 rounded-full bg-primary-100 text-primary-700 font-bold text-sm flex items-center justify-center uppercase"
+              >
+                {{ (user.firstName || '?').slice(0, 1) }}{{ (user.lastName || '').slice(0, 1) }}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="font-bold text-gray-900">{{ user.firstName || '—' }} {{ user.lastName || '' }}</p>
+                <p class="text-sm text-gray-500 truncate">{{ user.email }}</p>
+                <p class="text-sm text-gray-600 mt-0.5">{{ user.phone || '—' }}</p>
+                <span
+                  class="mt-2 inline-flex px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800 border border-gray-200/80"
+                >
+                  {{ roleLabel(user.role) }}
+                </span>
+              </div>
+            </div>
+            @if (userId(user)) {
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  (click)="openEdit(user)"
+                  class="px-4 py-2 text-sm font-bold rounded-lg border border-primary-200 text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  (click)="remove(user)"
+                  class="px-4 py-2 text-sm font-bold rounded-lg border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</div>
 
-      <form [formGroup]="editForms[user.id || '']" (ngSubmit)="update(user)">
-        <input formControlName="firstName" placeholder="First name" />
-        <input formControlName="lastName" placeholder="Last name" />
-        <input formControlName="phone" placeholder="Phone" />
-        <select formControlName="role">
-          <option value="customer">customer</option>
-          <option value="restaurant_owner">restaurant owner</option>
-          <option value="delivery_driver">delivery driver</option>
-          <option value="admin">admin</option>
-        </select>
-
-        <button type="submit">Save</button>
-        <button type="button" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded" (click)="remove(user)">Delete</button>
-      </form>
-    </article>
+<!-- Update: modal -->
+@if (editingUserId(); as eid) {
+  @if (editForms[eid]) {
+    <div
+      class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="users-edit-title"
+    >
+      <button
+        type="button"
+        class="absolute inset-0 bg-gray-900/50 w-full h-full border-0 cursor-default"
+        (click)="closeEdit()"
+        aria-label="Close dialog"
+      ></button>
+      <div
+        class="relative w-full sm:max-w-lg bg-white rounded-t-2xl sm:rounded-2xl shadow-xl border border-gray-200 max-h-[90vh] flex flex-col"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
+          <h2 id="users-edit-title" class="text-xl font-bold text-gray-900">Edit user</h2>
+          @if (editingUser(); as eu) {
+            <p class="text-sm text-gray-500 mt-1 truncate">{{ eu.email }}</p>
+          }
+        </div>
+        <form [formGroup]="editForms[eid]" (ngSubmit)="updateFromModal()" class="flex flex-col flex-1 min-h-0">
+          <div class="px-6 py-5 space-y-4 overflow-y-auto">
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1.5" for="ua-first-{{ eid }}">First name</label>
+              <input
+                id="ua-first-{{ eid }}"
+                formControlName="firstName"
+                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1.5" for="ua-last-{{ eid }}">Last name</label>
+              <input
+                id="ua-last-{{ eid }}"
+                formControlName="lastName"
+                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1.5" for="ua-phone-{{ eid }}">Phone</label>
+              <input
+                id="ua-phone-{{ eid }}"
+                formControlName="phone"
+                type="tel"
+                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-bold text-gray-700 mb-1.5" for="ua-role-{{ eid }}">Role</label>
+              <select
+                id="ua-role-{{ eid }}"
+                formControlName="role"
+                class="w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 font-medium text-gray-900"
+              >
+                <option value="customer">Customer</option>
+                <option value="restaurant_owner">Restaurant owner</option>
+                <option value="delivery_driver">Delivery driver</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <div
+            class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shrink-0 bg-gray-50/80 rounded-b-2xl"
+          >
+            <button
+              type="button"
+              (click)="removeEditingUser()"
+              class="px-4 py-2.5 text-sm font-bold rounded-lg border border-red-200 text-red-700 bg-white hover:bg-red-50 order-2 sm:order-1"
+            >
+              Delete user
+            </button>
+            <div class="flex flex-col-reverse sm:flex-row gap-2 order-1 sm:order-2 w-full sm:w-auto">
+              <button
+                type="button"
+                (click)="closeEdit()"
+                class="px-4 py-2.5 text-sm font-bold rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="px-5 py-2.5 text-sm font-bold rounded-lg bg-primary-600 text-white hover:bg-primary-700 shadow-sm"
+              >
+                Save changes
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   }
-</section>
+}

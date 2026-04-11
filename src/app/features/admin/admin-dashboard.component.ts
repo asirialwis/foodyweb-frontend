@@ -108,7 +108,7 @@ export class AdminDashboardComponent implements OnInit {
 
   private loadUsers(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.usersApi.findAll().subscribe({
+      this.usersApi.findAll({ limit: 500 }).subscribe({
         next: (users) => {
           this.usersSignal.set(users);
           resolve();

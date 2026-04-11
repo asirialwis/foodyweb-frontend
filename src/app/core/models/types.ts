@@ -68,6 +68,8 @@ export interface AuthResponse {
 }
 
 export interface User extends AuthUser {
+  /** MongoDB id when API returns _id without id */
+  _id?: string;
   phone?: string;
   address?: Address;
   addresses?: Address[]; // Multiple saved addresses

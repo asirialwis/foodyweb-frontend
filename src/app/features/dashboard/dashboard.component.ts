@@ -159,7 +159,7 @@ export class DashboardComponent implements OnInit {
     });
 
     if (this.role() === 'admin') {
-      this.usersApi.findAll().subscribe({
+      this.usersApi.findAll({ limit: 500 }).subscribe({
         next: (users) => this.userCount.set(users.length),
         error: () => {},
       });
