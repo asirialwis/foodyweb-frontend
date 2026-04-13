@@ -438,4 +438,16 @@
       </div>
     </div>
   </div>
+
+  <!-- Delete User Confirmation -->
+  <app-confirmation-modal
+    [isOpen]="!!userToDelete()"
+    title="Delete User Account"
+    [message]="'Are you sure you want to permanently delete ' + (userToDelete()?.firstName || 'this user') + ' ' + (userToDelete()?.lastName || '') + '? This action will remove all their data from the system.'"
+    confirmText="Delete User"
+    cancelText="Keep User"
+    type="danger"
+    (confirm)="confirmDeleteUser()"
+    (cancel)="cancelDeleteUser()"
+  ></app-confirmation-modal>
 </div>

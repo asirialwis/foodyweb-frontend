@@ -14,6 +14,7 @@ import { NotificationService } from '../../core/services/notification.service';
 import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner.component';
 import { RestaurantCardComponent } from '../../shared/components/restaurant-card.component';
 import { MenuItemCardComponent } from '../../shared/components/menu-item-card.component';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal.component';
 import { MenuItem, Restaurant, CuisineType } from '../../core/models/types';
 
 @Component({
@@ -26,6 +27,7 @@ import { MenuItem, Restaurant, CuisineType } from '../../core/models/types';
     LoadingSpinnerComponent,
     RestaurantCardComponent,
     MenuItemCardComponent,
+    ConfirmationModalComponent,
   ],
   templateUrl: './catalog.component.html',
   styleUrl: './catalog.component.scss',
@@ -56,14 +58,14 @@ export class CatalogComponent implements OnInit {
   readonly filteredMenuItems = computed(() => {
     const items = this.menuItems();
     const category = this.selectedCategorySignal();
-    
+
     if (!category) return items;
-    return items.filter(item => item.category === category);
+    return items.filter((item) => item.category === category);
   });
 
   readonly categories = computed(() => {
     const items = this.menuItems();
-    const cats = new Set(items.map(item => item.category));
+    const cats = new Set(items.map((item) => item.category));
     return Array.from(cats);
   });
 
@@ -83,12 +85,40 @@ export class CatalogComponent implements OnInit {
   readonly restaurantsLoading = this.restaurantsLoadingSignal.asReadonly();
   readonly menuItemsLoading = this.menuItemsLoadingSignal.asReadonly();
 
-  showCheckoutModal = signal(false);
+  public showCheckoutModal = signal(false);
+
+  // Combined confirmation modal configuration
+  public confirmModalConfig = signal<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText: string;
+    cancelText: string;
+    actionType: 'clear_cart' | 'remove_item' | null;
+    itemId?: string;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: '',
+    cancelText: '',
+    actionType: null,
+  });
+
   placingOrder = false;
 
   readonly cuisines: CuisineType[] = [
-    'italian', 'chinese', 'indian', 'mexican', 'american',
-    'japanese', 'thai', 'mediterranean', 'fusion', 'fast_food', 'vegetarian'
+    'italian',
+    'chinese',
+    'indian',
+    'mexican',
+    'american',
+    'japanese',
+    'thai',
+    'mediterranean',
+    'fusion',
+    'fast_food',
+    'vegetarian',
   ];
 
   readonly checkoutForm = this.fb.nonNullable.group({
@@ -105,9 +135,9 @@ export class CatalogComponent implements OnInit {
   ngOnInit(): void {
     this.loadTopRated();
     this.loadRestaurants();
-    
+
     // Check if restaurant ID is in route params
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       if (params['id']) {
         this.loadRestaurantMenu(params['id']);
       }
@@ -191,7 +221,9 @@ export class CatalogComponent implements OnInit {
       return;
     }
 
-    const existingRestaurantIds = new Set(this.cartItems().map((cartItem) => cartItem.restaurantId));
+    const existingRestaurantIds = new Set(
+      this.cartItems().map((cartItem) => cartItem.restaurantId),
+    );
     if (existingRestaurantIds.size > 0 && !existingRestaurantIds.has(selectedRestaurantId)) {
       this.notification.error('Cart can contain items from one restaurant at a time');
       return;
@@ -209,9 +241,33 @@ export class CatalogComponent implements OnInit {
     this.cartService.decrease(menuItemId);
   }
 
-  removeFromCart(menuItemId: string): void {
-    this.cartService.remove(menuItemId);
-    this.notification.info('Item removed from cart');
+  initiateRemoveFromCart(menuItemId: string): void {
+    this.confirmModalConfig.set({
+      isOpen: true,
+      title: 'Remove Item',
+      message: 'Are you sure you want to remove this item from your cart?',
+      confirmText: 'Remove',
+      cancelText: 'Keep Item',
+      actionType: 'remove_item',
+      itemId: menuItemId,
+    });
+  }
+
+  confirmModalAction(): void {
+    const config = this.confirmModalConfig();
+    if (config.actionType === 'clear_cart') {
+      this.cartService.clear();
+      this.notification.info('Cart cleared');
+    } else if (config.actionType === 'remove_item' && config.itemId) {
+      this.cartService.remove(config.itemId);
+      this.notification.info('Item removed from cart');
+    }
+
+    this.closeConfirmModal();
+  }
+
+  closeConfirmModal(): void {
+    this.confirmModalConfig.update((c) => ({ ...c, isOpen: false, actionType: null }));
   }
 
   onSearchChange(query: string): void {
@@ -239,9 +295,11 @@ export class CatalogComponent implements OnInit {
   }
 
   canCheckout(): boolean {
-    return this.cartItems().length > 0
-      && this.checkoutForm.valid
-      && !!(this.cartRestaurantId() || this.selectedRestaurant());
+    return (
+      this.cartItems().length > 0 &&
+      this.checkoutForm.valid &&
+      !!(this.cartRestaurantId() || this.selectedRestaurant())
+    );
   }
 
   openCheckout(): void {
@@ -268,9 +326,8 @@ export class CatalogComponent implements OnInit {
 
     const userId = this.authSession.user()?.id;
     // Derive restaurantId from cart items (resilient to page refresh)
-    const restaurantId = this.cartRestaurantId()
-      ?? this.selectedRestaurant()?._id
-      ?? this.selectedRestaurant()?.id;
+    const restaurantId =
+      this.cartRestaurantId() ?? this.selectedRestaurant()?._id ?? this.selectedRestaurant()?.id;
 
     if (!userId || !restaurantId) {
       this.notification.error('Unable to place order. Please try again.');
@@ -286,9 +343,8 @@ export class CatalogComponent implements OnInit {
         menuItemId: item.menuItemId,
         name: item.name,
         quantity: item.quantity,
-        price: item.discountPrice && item.discountPrice < item.price
-          ? item.discountPrice
-          : item.price,
+        price:
+          item.discountPrice && item.discountPrice < item.price ? item.discountPrice : item.price,
       })),
       totalAmount: this.cartTotal(),
       paymentMethod: payload.paymentMethod,
@@ -303,31 +359,34 @@ export class CatalogComponent implements OnInit {
     };
 
     this.placingOrder = true;
-    this.ordersApi
-      .create(orderPayload)
-      .subscribe({
-        next: () => {
-          this.notification.success('Order placed successfully!');
-          this.cartService.clear();
-          this.checkoutForm.reset({ paymentMethod: 'credit_card' });
-          this.showCheckoutModal.set(false);
-          this.router.navigate(['/orders']);
-        },
-        error: (err) => {
-          console.error('Could not place order', err);
-          this.notification.error('Could not place order. Please try again.');
-        },
-        complete: () => {
-          this.placingOrder = false;
-        },
-      });
+    this.ordersApi.create(orderPayload).subscribe({
+      next: () => {
+        this.notification.success('Order placed successfully!');
+        this.cartService.clear();
+        this.checkoutForm.reset({ paymentMethod: 'credit_card' });
+        this.showCheckoutModal.set(false);
+        this.router.navigate(['/orders']);
+      },
+      error: (err) => {
+        console.error('Could not place order', err);
+        this.notification.error('Could not place order. Please try again.');
+      },
+      complete: () => {
+        this.placingOrder = false;
+      },
+    });
   }
 
   clearCart(): void {
-    if (confirm('Are you sure you want to clear your cart?')) {
-      this.cartService.clear();
-      this.notification.info('Cart cleared');
-    }
+    this.confirmModalConfig.set({
+      isOpen: true,
+      title: 'Clear Shopping Cart',
+      message:
+        'Are you sure you want to remove all items from your cart? This action cannot be undone.',
+      confirmText: 'Clear Cart',
+      cancelText: 'Keep Items',
+      actionType: 'clear_cart',
+    });
   }
 
   formatAddress(restaurant: Restaurant | null): string {

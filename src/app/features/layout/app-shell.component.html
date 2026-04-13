@@ -36,4 +36,16 @@
   <main class="flex-1 p-4 md:p-6">
     <router-outlet />
   </main>
+
+  <!-- Logout Confirmation -->
+  <app-confirmation-modal
+    [isOpen]="showLogoutModal()"
+    title="Sign Out"
+    message="Are you sure you want to log out of your account?"
+    confirmText="Logout"
+    cancelText="Stay Logged In"
+    type="warning"
+    (confirm)="confirmLogout()"
+    (cancel)="cancelLogout()"
+  ></app-confirmation-modal>
 </div>

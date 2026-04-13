@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, ConfirmationModalComponent],
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
 })
@@ -15,6 +16,8 @@ export class AppShellComponent {
   private readonly authSession = inject(AuthSessionService);
   private readonly router = inject(Router);
   private readonly notification = inject(NotificationService);
+
+  readonly showLogoutModal = signal(false);
 
   readonly user = this.authSession.user;
   readonly toastMessages = this.notification.messages;
@@ -69,7 +72,16 @@ export class AppShellComponent {
   });
 
   logout(): void {
+    this.showLogoutModal.set(true);
+  }
+
+  confirmLogout(): void {
     this.authSession.clearSession();
     this.router.navigateByUrl('/login');
+    this.showLogoutModal.set(false);
+  }
+
+  cancelLogout(): void {
+    this.showLogoutModal.set(false);
   }
 }

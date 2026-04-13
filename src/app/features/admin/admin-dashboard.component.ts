@@ -8,12 +8,13 @@ import { DriversApiService } from '../../core/api/drivers-api.service';
 import { RestaurantsApiService } from '../../core/api/restaurants-api.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal.component';
 import { User, Order, Delivery, Driver, Restaurant } from '../../core/models/types';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmationModalComponent],
   templateUrl: './admin-dashboard.component.html',
   styleUrl: './admin-dashboard.component.scss',
 })
@@ -50,6 +51,8 @@ export class AdminDashboardComponent implements OnInit {
   readonly activeTabSignal = signal<'overview' | 'users' | 'orders' | 'deliveries' | 'drivers' | 'restaurants'>('overview');
   readonly selectedUserSignal = signal<User | null>(null);
   readonly selectedOrderSignal = signal<Order | null>(null);
+  readonly userToDelete = signal<User | null>(null);
+
   readonly selectedDeliverySignal = signal<Delivery | null>(null);
 
   setActiveTab(tab: string): void {
@@ -230,7 +233,12 @@ export class AdminDashboardComponent implements OnInit {
 
   deleteUser(user: User): void {
     if (!user.id) return;
-    if (!confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) return;
+    this.userToDelete.set(user);
+  }
+
+  confirmDeleteUser(): void {
+    const user = this.userToDelete();
+    if (!user || !user.id) return;
 
     this.savingSignal.set(true);
     this.usersApi
@@ -241,14 +249,20 @@ export class AdminDashboardComponent implements OnInit {
           this.usersSignal.set(users);
           this.notification.success('Success', 'User deleted');
           this.selectedUserSignal.set(null);
+          this.userToDelete.set(null);
           this.savingSignal.set(false);
         },
         error: (err) => {
           console.error('Error deleting user:', err);
           this.notification.error('Error', 'Failed to delete user');
           this.savingSignal.set(false);
+          this.userToDelete.set(null);
         },
       });
+  }
+
+  cancelDeleteUser(): void {
+    this.userToDelete.set(null);
   }
 
   getStatusBadgeClass(status: string | undefined): string {
