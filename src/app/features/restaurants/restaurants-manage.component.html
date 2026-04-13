@@ -319,6 +319,32 @@
   }
 </div>
 
+@if (showDeleteModalSignal()) {
+  <app-confirmation-modal
+    [isOpen]="true"
+    title="Delete Restaurant"
+    [message]="'Are you sure you want to delete \'' + selectedRestaurantSignal()?.name + '\'? This action cannot be undone.'"
+    confirmText="Delete"
+    cancelText="Cancel"
+    type="danger"
+    (confirm)="confirmDeleteRestaurant()"
+    (cancel)="cancelDeleteRestaurant()">
+  </app-confirmation-modal>
+}
+
+@if (itemToDeleteSignal()) {
+  <app-confirmation-modal
+    [isOpen]="true"
+    title="Delete Menu Item"
+    [message]="'Are you sure you want to delete \'' + itemToDeleteSignal()?.name + '\'?'"
+    confirmText="Delete"
+    cancelText="Cancel"
+    type="danger"
+    (confirm)="confirmDeleteMenuItem()"
+    (cancel)="cancelDeleteMenuItem()">
+  </app-confirmation-modal>
+}
+
 <!-- Add/Edit Restaurant Modal -->
 @if (showRestaurantFormSignal()) {
   <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

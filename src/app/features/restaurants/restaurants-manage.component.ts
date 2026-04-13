@@ -6,6 +6,7 @@ import { RestaurantsApiService } from '../../core/api/restaurants-api.service';
 import { MenuItemsApiService } from '../../core/api/menu-items-api.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ConfirmationModalComponent } from '../../shared/components/confirmation-modal.component';
 import { Restaurant, MenuItem, Order, OrderStatus } from '../../core/models/types';
 
 export type RestaurantTab = 'overview' | 'menu' | 'orders' | 'settings';
@@ -13,7 +14,7 @@ export type RestaurantTab = 'overview' | 'menu' | 'orders' | 'settings';
 @Component({
   selector: 'app-restaurants-manage',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmationModalComponent],
   templateUrl: './restaurants-manage.component.html',
   styleUrl: './restaurants-manage.component.scss',
 })
@@ -35,6 +36,8 @@ export class RestaurantsManageComponent implements OnInit {
   readonly activeTabSignal = signal<RestaurantTab>('overview');
   readonly showRestaurantFormSignal = signal(false);
   readonly showMenuFormSignal = signal(false);
+  readonly showDeleteModalSignal = signal(false);
+  readonly itemToDeleteSignal = signal<MenuItem | null>(null);
   readonly editingMenuItemSignal = signal<MenuItem | null>(null);
   readonly ordersFilterSignal = signal<OrderStatus | ''>('');
   readonly loadingOrdersSignal = signal(false);
@@ -284,8 +287,13 @@ export class RestaurantsManageComponent implements OnInit {
   deleteRestaurant(): void {
     const restaurant = this.selectedRestaurantSignal();
     if (!restaurant) return;
-    if (!confirm(`Are you sure you want to delete "${restaurant.name}"? This action cannot be undone.`)) return;
+    this.showDeleteModalSignal.set(true);
+  }
 
+  confirmDeleteRestaurant(): void {
+    const restaurant = this.selectedRestaurantSignal();
+    if (!restaurant) return;
+    
     const id = this.getRestaurantId(restaurant);
     if (!id) return;
 
@@ -293,10 +301,18 @@ export class RestaurantsManageComponent implements OnInit {
       next: () => {
         this.notification.success('Restaurant deleted', '');
         this.selectedRestaurantSignal.set(null);
+        this.showDeleteModalSignal.set(false);
         this.loadRestaurants();
       },
-      error: (err: any) => this.notification.error('Delete failed', err?.error?.message),
+      error: (err: any) => {
+        this.notification.error('Delete failed', err?.error?.message);
+        this.showDeleteModalSignal.set(false);
+      }
     });
+  }
+
+  cancelDeleteRestaurant(): void {
+    this.showDeleteModalSignal.set(false);
   }
 
   // ── Menu CRUD ─────────────────────────────────────────────────────────────
@@ -394,17 +410,32 @@ export class RestaurantsManageComponent implements OnInit {
   }
 
   deleteMenuItem(item: MenuItem): void {
+    this.itemToDeleteSignal.set(item);
+  }
+
+  confirmDeleteMenuItem(): void {
+    const item = this.itemToDeleteSignal();
+    if (!item) return;
+
     const id = item._id ?? item.id;
-    if (!id || !confirm(`Delete "${item.name}"?`)) return;
+    if (!id) return;
 
     this.menuItemsApi.remove(id).subscribe({
       next: () => {
         this.notification.success('Item deleted', '');
         const restaurantId = this.getRestaurantId(this.selectedRestaurantSignal()!);
         if (restaurantId) this.loadMenuItems(restaurantId);
+        this.itemToDeleteSignal.set(null);
       },
-      error: (err: any) => this.notification.error('Delete failed', err?.error?.message),
+      error: (err: any) => {
+        this.notification.error('Delete failed', err?.error?.message);
+        this.itemToDeleteSignal.set(null);
+      },
     });
+  }
+
+  cancelDeleteMenuItem(): void {
+    this.itemToDeleteSignal.set(null);
   }
 
   // ── Order Management ──────────────────────────────────────────────────────
