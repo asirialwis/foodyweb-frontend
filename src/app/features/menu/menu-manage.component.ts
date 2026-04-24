@@ -41,6 +41,7 @@ export class MenuManageComponent implements OnInit {
     category: ['main', Validators.required],
     price: [0, Validators.required],
     description: [''],
+    imageUrl: [''],
   });
 
   ngOnInit(): void {
@@ -81,10 +82,11 @@ export class MenuManageComponent implements OnInit {
         category: payload.category,
         price: Number(payload.price),
         description: payload.description || undefined,
+        imageUrl: payload.imageUrl || undefined,
       } as MenuItem)
       .subscribe(() => {
         this.notification.show({ type: 'success', text: 'Menu item added' });
-        this.form.patchValue({ name: '', category: 'main', price: 0, description: '' });
+        this.form.patchValue({ name: '', category: 'main', price: 0, description: '', imageUrl: '' });
         this.loadItems();
       });
   }
